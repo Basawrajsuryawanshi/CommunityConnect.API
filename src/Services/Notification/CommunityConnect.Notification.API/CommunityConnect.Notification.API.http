@@ -1,0 +1,6 @@
+@CommunityConnect.Notification.API_HostAddress = http://localhost:5123
+
+GET {{CommunityConnect.Notification.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

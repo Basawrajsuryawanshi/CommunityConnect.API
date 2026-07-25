@@ -1,0 +1,54 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Gateway/">
+    <Project Path="src/Gateway/CommunityConnect.Gateway/CommunityConnect.Gateway.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Analytics/">
+    <Project Path="src/Services/Analytics/CommunityConnect.Analytics.API/CommunityConnect.Analytics.API.csproj" />
+    <Project Path="src/Services/Analytics/CommunityConnect.Analytics.Core/CommunityConnect.Analytics.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Announcement/">
+    <Project Path="src/Services/Announcement/CommunityConnect.Announcement.API/CommunityConnect.Announcement.API.csproj" />
+    <Project Path="src/Services/Announcement/CommunityConnect.Announcement.Core/CommunityConnect.Announcement.Core.csproj" />
+    <Project Path="src/Services/Announcement/CommunityConnect.Announcement.Infrastructure/CommunityConnect.Announcement.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Auth/">
+    <Project Path="src/Services/Auth/CommunityConnect.Auth.API/CommunityConnect.Auth.API.csproj" />
+    <Project Path="src/Services/Auth/CommunityConnect.Auth.Core/CommunityConnect.Auth.Core.csproj" />
+    <Project Path="src/Services/Auth/CommunityConnect.Auth.Infrastructure/CommunityConnect.Auth.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Discussion/">
+    <Project Path="src/Services/Discussion/CommunityConnect.Discussion.API/CommunityConnect.Discussion.API.csproj" />
+    <Project Path="src/Services/Discussion/CommunityConnect.Discussion.Core/CommunityConnect.Discussion.Core.csproj" />
+    <Project Path="src/Services/Discussion/CommunityConnect.Discussion.Infrastructure/CommunityConnect.Discussion.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Event/">
+    <Project Path="src/Services/Event/CommunityConnect.Event.API/CommunityConnect.Event.API.csproj" />
+    <Project Path="src/Services/Event/CommunityConnect.Event.Core/CommunityConnect.Event.Core.csproj" />
+    <Project Path="src/Services/Event/CommunityConnect.Event.Infrastructure/CommunityConnect.Event.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Media/">
+    <Project Path="src/Services/Media/CommunityConnect.Media.API/CommunityConnect.Media.API.csproj" />
+    <Project Path="src/Services/Media/CommunityConnect.Media.Core/CommunityConnect.Media.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Notification/">
+    <Project Path="src/Services/Notification/CommunityConnect.Notification.API/CommunityConnect.Notification.API.csproj" />
+    <Project Path="src/Services/Notification/CommunityConnect.Notification.Core/CommunityConnect.Notification.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/User/">
+    <Project Path="src/Services/User/CommunityConnect.User.API/CommunityConnect.User.API.csproj" />
+    <Project Path="src/Services/User/CommunityConnect.User.Core/CommunityConnect.User.Core.csproj" />
+    <Project Path="src/Services/User/CommunityConnect.User.Infrastructure/CommunityConnect.User.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/CommunityConnect.Common/CommunityConnect.Common.csproj" />
+    <Project Path="src/Shared/CommunityConnect.Contracts/CommunityConnect.Contracts.csproj" />
+    <Project Path="src/Shared/CommunityConnect.MessageBus/CommunityConnect.MessageBus.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CommunityConnect.Auth.Tests/CommunityConnect.Auth.Tests.csproj" />
+    <Project Path="tests/CommunityConnect.IntegrationTests/CommunityConnect.IntegrationTests.csproj" />
+    <Project Path="tests/CommunityConnect.User.Tests/CommunityConnect.User.Tests.csproj" />
+  </Folder>
+</Solution>
