@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CommunityConnect.Auth.Core\CommunityConnect.Auth.Core.csproj" />
     <ProjectReference Include="..\CommunityConnect.Auth.Infrastructure\CommunityConnect.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Shared\CommunityConnect.Contracts\CommunityConnect.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
