@@ -2,11 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using CommunityConnect.Auth.Core.Data;
 using CommunityConnect.Auth.Core.Entities;
 using CommunityConnect.Auth.Core.Services;
-using CommunityConnect.Auth.Infrastructure.Data;
 using CommunityConnect.Contracts.Auth;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,33 +13,30 @@ namespace CommunityConnect.Auth.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly AuthDbContext _context;
+        private readonly IAuthDatabase _authDatabase;
         private readonly IConfiguration _configuration;
 
-        public AuthService(AuthDbContext context, IConfiguration configuration)
+        public AuthService(IAuthDatabase authDatabase, IConfiguration configuration)
         {
-            _context = context;
+            _authDatabase = authDatabase;
             _configuration = configuration;
         }
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
         {
-            // Check if user exists
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            // Check if user exists using stored procedure
+            var existingUser = await _authDatabase.GetUserByEmailAsync(request.Email);
+            if (existingUser != null)
             {
                 throw new Exception("User with this email already exists");
             }
 
-            // Create user
-            var user = new User
-            {
-                Email = request.Email,
-                PasswordHash = HashPassword(request.Password),
-                EmailVerified = false
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            // Create user using stored procedure
+            var user = await _authDatabase.CreateUserAsync(
+                email: request.Email,
+                passwordHash: HashPassword(request.Password),
+                emailVerified: false
+            );
 
             // Generate tokens
             var accessToken = GenerateAccessToken(user);
@@ -57,8 +53,8 @@ namespace CommunityConnect.Auth.Infrastructure.Services
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == request.Email);
+            // Get user using stored procedure
+            var user = await _authDatabase.GetUserByEmailAsync(request.Email);
 
             if (user == null || !VerifyPassword(request.Password, user.PasswordHash!))
             {
@@ -70,9 +66,8 @@ namespace CommunityConnect.Auth.Infrastructure.Services
                 throw new Exception("Account is deactivated");
             }
 
-            // Update last login
-            user.LastLoginAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            // Update last login using stored procedure
+            await _authDatabase.UpdateLastLoginAsync(user.Id, DateTime.UtcNow);
 
             // Generate tokens
             var accessToken = GenerateAccessToken(user);
@@ -97,28 +92,31 @@ namespace CommunityConnect.Auth.Infrastructure.Services
 
         public async Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request)
         {
-            var refreshToken = await _context.RefreshTokens
-                .Include(rt => rt.User)
-                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
+            // Get refresh token using stored procedure
+            var refreshToken = await _authDatabase.GetRefreshTokenAsync(request.RefreshToken);
 
             if (refreshToken == null || refreshToken.IsRevoked || refreshToken.ExpiresAt < DateTime.UtcNow)
             {
                 throw new Exception("Invalid or expired refresh token");
             }
 
-            // Revoke old token
-            refreshToken.IsRevoked = true;
-            refreshToken.RevokedAt = DateTime.UtcNow;
+            // Get user using stored procedure
+            var user = await _authDatabase.GetUserByIdAsync(refreshToken.UserId);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            // Revoke old token using stored procedure
+            await _authDatabase.RevokeRefreshTokenAsync(refreshToken.Token);
 
             // Generate new tokens
-            var accessToken = GenerateAccessToken(refreshToken.User);
-            var newRefreshToken = await GenerateRefreshTokenAsync(refreshToken.UserId, "");
-
-            await _context.SaveChangesAsync();
+            var accessToken = GenerateAccessToken(user);
+            var newRefreshToken = await GenerateRefreshTokenAsync(user.Id, "");
 
             return new AuthResponse(
-                refreshToken.User.Id,
-                refreshToken.User.Email,
+                user.Id,
+                user.Email,
                 accessToken,
                 newRefreshToken.Token,
                 newRefreshToken.ExpiresAt
@@ -127,17 +125,8 @@ namespace CommunityConnect.Auth.Infrastructure.Services
 
         public async Task LogoutAsync(Guid userId)
         {
-            var refreshTokens = await _context.RefreshTokens
-                .Where(rt => rt.UserId == userId && !rt.IsRevoked)
-                .ToListAsync();
-
-            foreach (var token in refreshTokens)
-            {
-                token.IsRevoked = true;
-                token.RevokedAt = DateTime.UtcNow;
-            }
-
-            await _context.SaveChangesAsync();
+            // Revoke all user tokens using stored procedure
+            await _authDatabase.RevokeAllUserTokensAsync(userId);
         }
 
         public Task<bool> ValidateTokenAsync(string token)
@@ -173,16 +162,16 @@ namespace CommunityConnect.Auth.Infrastructure.Services
 
         private async Task<RefreshToken> GenerateRefreshTokenAsync(Guid userId, string ipAddress)
         {
-            var refreshToken = new RefreshToken
-            {
-                UserId = userId,
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                ExpiresAt = DateTime.UtcNow.AddDays(7),
-                CreatedByIp = ipAddress
-            };
+            var tokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            var expiresAt = DateTime.UtcNow.AddDays(7);
 
-            _context.RefreshTokens.Add(refreshToken);
-            await _context.SaveChangesAsync();
+            // Create refresh token using stored procedure
+            var refreshToken = await _authDatabase.CreateRefreshTokenAsync(
+                userId: userId,
+                token: tokenValue,
+                expiresAt: expiresAt,
+                createdByIp: ipAddress
+            );
 
             return refreshToken;
         }

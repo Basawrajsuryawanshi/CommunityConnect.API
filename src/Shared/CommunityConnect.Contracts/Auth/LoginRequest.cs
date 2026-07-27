@@ -4,9 +4,7 @@ namespace CommunityConnect.Contracts.Auth
 
     public record RegisterRequest(
         string Email,
-        string Password,
-        string FirstName,
-        string LastName
+        string Password
     );
 
     public record GoogleLoginRequest(string IdToken);
