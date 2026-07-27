@@ -1,3 +1,4 @@
+using CommunityConnect.Auth.Core.Data;
 using CommunityConnect.Auth.Core.Services;
 using CommunityConnect.Auth.Infrastructure.Data;
 using CommunityConnect.Auth.Infrastructure.Services;
@@ -10,9 +11,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Database - SQL Server
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
+// Database - Keep DbContext for EF migrations (optional)
+// Uncomment if you want to use EF migrations for schema management
+// builder.Services.AddDbContext<AuthDbContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
+
+// Register stored procedure-based database service
+builder.Services.AddScoped<IAuthDatabase, AuthDatabaseService>();
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
