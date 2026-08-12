@@ -1,6 +1,9 @@
 # ============================================
 # Auth Database Setup Script
-# This script automates the database initialization
+# This script automates the complete database setup including:
+# - Database creation
+# - Tables deployment (8 tables)
+# - Stored procedures deployment (34 procedures)
 # ============================================
 
 param(
@@ -78,7 +81,8 @@ else {
 $scriptRoot = $PSScriptRoot
 $projectRoot = Split-Path (Split-Path $scriptRoot -Parent) -Parent
 $initScript = Join-Path $scriptRoot "InitializeDatabase.sql"
-$spScript = Join-Path $scriptRoot "StoredProcedures.sql"
+$tablesFolder = Join-Path $scriptRoot "Tables"
+$spDeployScript = Join-Path $scriptRoot "DeployStoredProcedures.ps1"
 
 # Verify script files exist
 Write-Host "`nVerifying script files..." -ForegroundColor Yellow
@@ -86,15 +90,19 @@ if (-not (Test-Path $initScript)) {
 	Write-Host "✗ InitializeDatabase.sql not found at: $initScript" -ForegroundColor Red
 	exit 1
 }
-if (-not (Test-Path $spScript)) {
-	Write-Host "✗ StoredProcedures.sql not found at: $spScript" -ForegroundColor Red
+if (-not (Test-Path $tablesFolder)) {
+	Write-Host "✗ Tables folder not found at: $tablesFolder" -ForegroundColor Red
+	exit 1
+}
+if (-not (Test-Path $spDeployScript)) {
+	Write-Host "✗ DeployStoredProcedures.ps1 not found at: $spDeployScript" -ForegroundColor Red
 	exit 1
 }
 Write-Host "✓ Script files found" -ForegroundColor Green
 
 # Check if database exists
 Write-Host "`nChecking if database exists..." -ForegroundColor Yellow
-$dbCheckQuery = "SELECT DB_ID('CommunityConnect_AuthDB') AS DbId"
+$dbCheckQuery = "SELECT DB_ID('AuthDB') AS DbId"
 try {
 	$result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $dbCheckQuery -ErrorAction Stop
 	$dbExists = $null -ne $result.DbId
@@ -102,7 +110,7 @@ try {
 	if ($dbExists) {
 		if ($Force) {
 			Write-Host "Database exists. Force flag set - will drop and recreate." -ForegroundColor Yellow
-			$dropQuery = "USE master; ALTER DATABASE CommunityConnect_AuthDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE CommunityConnect_AuthDB;"
+			$dropQuery = "USE master; ALTER DATABASE AuthDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE AuthDB;"
 			Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $dropQuery -ErrorAction Stop
 			Write-Host "✓ Existing database dropped" -ForegroundColor Green
 		}
@@ -122,48 +130,83 @@ catch {
 }
 
 # Execute InitializeDatabase.sql
-Write-Host "`nCreating database and tables..." -ForegroundColor Yellow
+Write-Host "`nCreating database..." -ForegroundColor Yellow
 try {
 	Invoke-Sqlcmd -ServerInstance $ServerInstance -InputFile $initScript -ErrorAction Stop
-	Write-Host "✓ Database and tables created successfully" -ForegroundColor Green
+	Write-Host "✓ Database created successfully" -ForegroundColor Green
 }
 catch {
 	Write-Host "✗ Error creating database: $_" -ForegroundColor Red
 	exit 1
 }
 
-# Execute StoredProcedures.sql
-Write-Host "`nCreating stored procedures..." -ForegroundColor Yellow
+# Deploy tables in order
+Write-Host "`nDeploying tables..." -ForegroundColor Yellow
+$tableOrder = @(
+	'Users.sql',
+	'RefreshTokens.sql',
+	'OAuthProviders.sql',
+	'UserProfiles.sql',
+	'Roles.sql',
+	'UserRoleAssignments.sql',
+	'UserPreferences.sql',
+	'UserConnections.sql'
+)
+
+$tableSuccess = 0
+$tableFailed = 0
+
+foreach ($tableName in $tableOrder) {
+	$tablePath = Join-Path $tablesFolder $tableName
+	try {
+		Invoke-Sqlcmd -ServerInstance $ServerInstance -InputFile $tablePath -ErrorAction Stop
+		Write-Host "  ✓ $tableName deployed" -ForegroundColor Green
+		$tableSuccess++
+	}
+	catch {
+		Write-Host "  ✗ $tableName failed: $_" -ForegroundColor Red
+		$tableFailed++
+	}
+}
+
+if ($tableFailed -gt 0) {
+	Write-Host "✗ Some tables failed to deploy" -ForegroundColor Red
+	exit 1
+}
+Write-Host "✓ All tables deployed successfully ($tableSuccess tables)" -ForegroundColor Green
+
+# Execute DeployStoredProcedures.ps1
+Write-Host "`nDeploying stored procedures..." -ForegroundColor Yellow
 try {
-	Invoke-Sqlcmd -ServerInstance $ServerInstance -InputFile $spScript -ErrorAction Stop
-	Write-Host "✓ Stored procedures created successfully" -ForegroundColor Green
+	& $spDeployScript -ServerInstance $ServerInstance -Database "AuthDB"
+	Write-Host "✓ Stored procedures deployment completed" -ForegroundColor Green
 }
 catch {
-	Write-Host "✗ Error creating stored procedures: $_" -ForegroundColor Red
+	Write-Host "✗ Error deploying stored procedures: $_" -ForegroundColor Red
 	exit 1
 }
 
 # Verify installation
 Write-Host "`nVerifying installation..." -ForegroundColor Yellow
 try {
-	$tableQuery = "USE CommunityConnect_AuthDB; SELECT COUNT(*) AS TableCount FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';"
-	$spQuery = "USE CommunityConnect_AuthDB; SELECT COUNT(*) AS SPCount FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE';"
+	$tableQuery = "USE AuthDB; SELECT COUNT(*) AS TableCount FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';"
+	$spQuery = "USE AuthDB; SELECT COUNT(*) AS SPCount FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE';"
 
 	$tableCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $tableQuery -ErrorAction Stop).TableCount
 	$spCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $spQuery -ErrorAction Stop).SPCount
 
-	Write-Host "  Tables created: $tableCount (expected: 3)" -ForegroundColor Cyan
-	Write-Host "  Stored procedures created: $spCount (expected: 15)" -ForegroundColor Cyan
+	Write-Host "  Tables created: $tableCount (expected: 8)" -ForegroundColor Cyan
+	Write-Host "  Stored procedures created: $spCount (expected: 34)" -ForegroundColor Cyan
 
-	if ($tableCount -eq 3 -and $spCount -eq 15) {
-		Write-Host "[OK] Installation verified successfully" -ForegroundColor Green
+	if ($tableCount -eq 8 -and $spCount -eq 34) {
+		Write-Host "✓ Installation verified successfully" -ForegroundColor Green
 	}
 	else {
-		Write-Host "[Warning] Expected counts dont match. Please verify manually." -ForegroundColor Yellow
+		Write-Host "⚠ Expected counts don't match. Please verify manually." -ForegroundColor Yellow
 	}
 }
 catch {
-	Write-Host "[Error] Error verifying installation: $_" -ForegroundColor Red
+	Write-Host "✗ Error verifying installation: $_" -ForegroundColor Red
 }
 
 # Display connection string
@@ -171,7 +214,7 @@ Write-Host "`n============================================" -ForegroundColor Cya
 Write-Host "Setup completed successfully!" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "`nConnection String:" -ForegroundColor Yellow
-Write-Host "Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=CommunityConnect_AuthDB;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Command Timeout=0" -ForegroundColor White
+Write-Host "Data Source=$ServerInstance;Initial Catalog=AuthDB;Integrated Security=True;TrustServerCertificate=True" -ForegroundColor White
 
 Write-Host "`nNext Steps:" -ForegroundColor Yellow
 Write-Host "1. Open the Auth.API project in Visual Studio" -ForegroundColor White
