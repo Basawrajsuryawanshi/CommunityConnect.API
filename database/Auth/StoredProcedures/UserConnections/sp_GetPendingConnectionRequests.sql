@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetPendingC
 GO
 
 CREATE PROCEDURE sp_GetPendingConnectionRequests
-	@UserId UNIQUEIDENTIFIER
+	@UserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -37,5 +37,6 @@ BEGIN
 	ORDER BY uc.RequestedAt DESC;
 END
 GO
+
 
 

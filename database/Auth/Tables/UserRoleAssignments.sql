@@ -8,10 +8,10 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserRoleAssignments')
 BEGIN
 	CREATE TABLE UserRoleAssignments (
 		Id INT IDENTITY(1,1) PRIMARY KEY,
-		UserId UNIQUEIDENTIFIER NOT NULL,
+		UserId INT NOT NULL,
 		RoleId INT NOT NULL,
 		AssignedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-		AssignedBy UNIQUEIDENTIFIER NULL,
+		AssignedBy INT NULL,
 		ExpiresAt DATETIME2 NULL,
 
 		CONSTRAINT FK_UserRoleAssignments_Users FOREIGN KEY (UserId) 

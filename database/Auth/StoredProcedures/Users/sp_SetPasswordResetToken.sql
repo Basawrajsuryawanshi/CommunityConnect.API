@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_SetPassword
 GO
 
 CREATE PROCEDURE sp_SetPasswordResetToken
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@ResetToken NVARCHAR(500),
 	@Expiry DATETIME2
 AS
@@ -30,3 +30,4 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+

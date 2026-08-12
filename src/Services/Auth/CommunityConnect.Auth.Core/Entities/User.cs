@@ -4,7 +4,7 @@ namespace CommunityConnect.Auth.Core.Entities
 {
     public class User
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public int Id { get; set; }
         public string Email { get; set; } = string.Empty;
         public string? PasswordHash { get; set; }
         public bool EmailVerified { get; set; }
@@ -26,7 +26,7 @@ namespace CommunityConnect.Auth.Core.Entities
     public class RefreshToken
     {
         public int Id { get; set; }
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
         public string Token { get; set; } = string.Empty;
         public DateTime ExpiresAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -42,7 +42,7 @@ namespace CommunityConnect.Auth.Core.Entities
     public class OAuthProvider
     {
         public int Id { get; set; }
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
         public string Provider { get; set; } = string.Empty;
         public string ProviderUserId { get; set; } = string.Empty;
         public string? AccessToken { get; set; }

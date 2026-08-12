@@ -124,7 +124,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
         {
             return new User
             {
-                Id = reader.GetGuid(reader.GetOrdinal("Id")),
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
                 Email = reader.GetString(reader.GetOrdinal("Email")),
                 PasswordHash = reader.IsDBNull(reader.GetOrdinal("PasswordHash")) ? null : reader.GetString(reader.GetOrdinal("PasswordHash")),
                 EmailVerified = reader.GetBoolean(reader.GetOrdinal("EmailVerified")),
@@ -145,7 +145,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return new RefreshToken
             {
                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
+                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
                 Token = reader.GetString(reader.GetOrdinal("Token")),
                 ExpiresAt = reader.GetDateTime(reader.GetOrdinal("ExpiresAt")),
                 CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
@@ -162,7 +162,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return new OAuthProvider
             {
                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
+                UserId = reader.GetInt32(reader.GetOrdinal("UserId")),
                 Provider = reader.GetString(reader.GetOrdinal("Provider")),
                 ProviderUserId = reader.GetString(reader.GetOrdinal("ProviderUserId")),
                 AccessToken = reader.IsDBNull(reader.GetOrdinal("AccessToken")) ? null : reader.GetString(reader.GetOrdinal("AccessToken")),
@@ -173,12 +173,49 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             };
         }
 
+        private UserProfile MapUserProfile(SqlDataReader reader)
+        {
+            return new UserProfile
+            {
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                FullName = reader.GetString(reader.GetOrdinal("FullName")),
+                Email = reader.GetString(reader.GetOrdinal("Email")),
+                MobileNumber = reader.GetString(reader.GetOrdinal("MobileNumber")),
+                SchoolName = reader.GetString(reader.GetOrdinal("SchoolName")),
+                State = reader.IsDBNull(reader.GetOrdinal("State")) ? string.Empty : reader.GetString(reader.GetOrdinal("State")),
+                SchoolRegion = reader.IsDBNull(reader.GetOrdinal("SchoolRegion")) ? string.Empty : reader.GetString(reader.GetOrdinal("SchoolRegion")),
+                PassoutYear = reader.GetInt32(reader.GetOrdinal("PassoutYear")),
+                Role = reader.GetString(reader.GetOrdinal("Role")),
+                University = reader.IsDBNull(reader.GetOrdinal("University")) ? string.Empty : reader.GetString(reader.GetOrdinal("University")),
+                CurrentState = reader.IsDBNull(reader.GetOrdinal("CurrentState")) ? string.Empty : reader.GetString(reader.GetOrdinal("CurrentState")),
+                CurrentDistrict = reader.IsDBNull(reader.GetOrdinal("CurrentDistrict")) ? string.Empty : reader.GetString(reader.GetOrdinal("CurrentDistrict")),
+                BloodGroup = reader.IsDBNull(reader.GetOrdinal("BloodGroup")) ? string.Empty : reader.GetString(reader.GetOrdinal("BloodGroup")),
+                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                UpdatedAt = reader.IsDBNull(reader.GetOrdinal("UpdatedAt")) ? DateTime.UtcNow : reader.GetDateTime(reader.GetOrdinal("UpdatedAt"))
+            };
+        }
+
         // ============================================
         // USER OPERATIONS
         // ============================================
 
-        public async Task<User> CreateUserAsync(string email, string passwordHash, bool emailVerified = false,
-            string? emailVerificationToken = null, DateTime? emailVerificationExpiry = null)
+        public async Task<User> CreateUserAsync(
+            string email,
+            string passwordHash,
+            string fullName,
+            string mobileNumber,
+            string schoolName,
+            string state,
+            string schoolRegion,
+            int passoutYear,
+            string role,
+            string university,
+            string currentState,
+            string currentDistrict,
+            string bloodGroup,
+            bool emailVerified = false,
+            string? emailVerificationToken = null,
+            DateTime? emailVerificationExpiry = null)
         {
             var parameters = new[]
             {
@@ -191,7 +228,28 @@ namespace CommunityConnect.Auth.Infrastructure.Data
 
             var user = await ExecuteReaderSingleAsync("sp_CreateUser", MapUser, parameters);
 
-            return user ?? throw new InvalidOperationException("Failed to create user");
+            if (user == null)
+            {
+                throw new InvalidOperationException("Failed to create user");
+            }
+
+            // Create user profile after user creation
+            await CreateUserProfileAsync(
+                user.Id,
+                fullName,
+                email,
+                mobileNumber,
+                schoolName,
+                state,
+                schoolRegion,
+                passoutYear,
+                role,
+                university,
+                currentState,
+                currentDistrict,
+                bloodGroup);
+
+            return user;
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)
@@ -204,7 +262,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return await ExecuteReaderSingleAsync("sp_GetUserByEmail", MapUser, parameters);
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid userId)
+        public async Task<User?> GetUserByIdAsync(int userId)
         {
             var parameters = new[]
             {
@@ -214,7 +272,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return await ExecuteReaderSingleAsync("sp_GetUserById", MapUser, parameters);
         }
 
-        public async Task UpdateLastLoginAsync(Guid userId, DateTime lastLoginAt)
+        public async Task UpdateLastLoginAsync(int userId, DateTime lastLoginAt)
         {
             var parameters = new[]
             {
@@ -237,7 +295,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return rowsAffected > 0;
         }
 
-        public async Task<bool> UpdatePasswordAsync(Guid userId, string newPasswordHash)
+        public async Task<bool> UpdatePasswordAsync(int userId, string newPasswordHash)
         {
             var parameters = new[]
             {
@@ -249,7 +307,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return rowsAffected > 0;
         }
 
-        public async Task<bool> SetPasswordResetTokenAsync(Guid userId, string resetToken, DateTime expiry)
+        public async Task<bool> SetPasswordResetTokenAsync(int userId, string resetToken, DateTime expiry)
         {
             var parameters = new[]
             {
@@ -262,7 +320,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return rowsAffected > 0;
         }
 
-        public async Task<bool> DeleteUserAsync(Guid userId)
+        public async Task<bool> DeleteUserAsync(int userId)
         {
             var parameters = new[]
             {
@@ -277,7 +335,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
         // REFRESH TOKEN OPERATIONS
         // ============================================
 
-        public async Task<RefreshToken> CreateRefreshTokenAsync(Guid userId, string token, DateTime expiresAt, string? createdByIp = null)
+        public async Task<RefreshToken> CreateRefreshTokenAsync(int userId, string token, DateTime expiresAt, string? createdByIp = null)
         {
             var parameters = new[]
             {
@@ -315,7 +373,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             return rowsAffected > 0;
         }
 
-        public async Task<int> RevokeAllUserTokensAsync(Guid userId)
+        public async Task<int> RevokeAllUserTokensAsync(int userId)
         {
             var parameters = new[]
             {
@@ -329,7 +387,7 @@ namespace CommunityConnect.Auth.Infrastructure.Data
         // OAUTH PROVIDER OPERATIONS
         // ============================================
 
-        public async Task<OAuthProvider> UpsertOAuthProviderAsync(Guid userId, string provider, string providerUserId,
+        public async Task<OAuthProvider> UpsertOAuthProviderAsync(int userId, string provider, string providerUserId,
             string? accessToken = null, string? refreshToken = null, DateTime? tokenExpiresAt = null)
         {
             var parameters = new[]
@@ -367,6 +425,47 @@ namespace CommunityConnect.Auth.Infrastructure.Data
             };
 
             return await ExecuteReaderSingleAsync("sp_GetUserByOAuthProvider", MapUser, parameters);
+        }
+
+        // ============================================
+        // USER PROFILE OPERATIONS
+        // ============================================
+
+        public async Task<UserProfile> CreateUserProfileAsync(
+            int id,
+            string fullName,
+            string email,
+            string mobileNumber,
+            string schoolName,
+            string state,
+            string schoolRegion,
+            int passoutYear,
+            string role,
+            string university,
+            string currentState,
+            string currentDistrict,
+            string bloodGroup)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@Id", id),
+                new SqlParameter("@FullName", fullName),
+                new SqlParameter("@Email", email),
+                new SqlParameter("@MobileNumber", mobileNumber),
+                new SqlParameter("@SchoolName", schoolName),
+                new SqlParameter("@State", state),
+                new SqlParameter("@SchoolRegion", schoolRegion),
+                new SqlParameter("@PassoutYear", passoutYear),
+                new SqlParameter("@Role", role),
+                new SqlParameter("@University", university),
+                new SqlParameter("@CurrentState", currentState),
+                new SqlParameter("@CurrentDistrict", currentDistrict),
+                new SqlParameter("@BloodGroup", bloodGroup)
+            };
+
+            var userProfile = await ExecuteReaderSingleAsync("sp_CreateUserProfile", MapUserProfile, parameters);
+
+            return userProfile ?? throw new InvalidOperationException("Failed to create user profile");
         }
     }
 }

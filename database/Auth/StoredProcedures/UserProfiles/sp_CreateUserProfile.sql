@@ -14,9 +14,9 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_CreateUserP
 GO
 
 CREATE PROCEDURE sp_CreateUserProfile
-	@Id UNIQUEIDENTIFIER,
+	@Id INT,
 	@FullName NVARCHAR(255),
-	@EmailID NVARCHAR(255) = NULL,
+	@Email NVARCHAR(255) = NULL,
 	@MobileNumber NVARCHAR(10),
 	@SchoolName NVARCHAR(255),
 	@State NVARCHAR(100),
@@ -34,13 +34,13 @@ BEGIN
 	DECLARE @Now DATETIME2 = GETUTCDATE();
 
 	INSERT INTO UserProfiles (
-		Id, FullName, EmailID, MobileNumber,
+		Id, FullName, Email, MobileNumber,
 		SchoolName, State, SchoolRegion, PassoutYear,
 		Role, University, CurrentState, CurrentDistrict,
 		BloodGroup, CreatedAt, UpdatedAt
 	)
 	VALUES (
-		@Id, @FullName, @EmailID, @MobileNumber,
+		@Id, @FullName, @Email, @MobileNumber,
 		@SchoolName, @State, @SchoolRegion, @PassoutYear,
 		@Role, @University, @CurrentState, @CurrentDistrict,
 		@BloodGroup, @Now, @Now
@@ -48,10 +48,24 @@ BEGIN
 
 	-- Return the created profile
 	SELECT 
-		Id, FullName, EmailID, MobileNumber, SchoolName, 
-		PassoutYear, Role, University, CreatedAt
+		Id, 
+		FullName, 
+		Email, 
+		MobileNumber, 
+		SchoolName, 
+		State,          
+		SchoolRegion,   
+		PassoutYear, 
+		Role, 
+		University, 
+		CurrentState,   
+		CurrentDistrict,
+		BloodGroup,     
+		CreatedAt,
+		UpdatedAt       
 	FROM UserProfiles
 	WHERE Id = @Id;
 END
 GO
+
 

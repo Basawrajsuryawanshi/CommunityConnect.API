@@ -15,7 +15,7 @@ GO
 
 CREATE PROCEDURE sp_RejectConnectionRequest
 	@ConnectionId INT,
-	@ConnectedUserId UNIQUEIDENTIFIER
+	@ConnectedUserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -29,5 +29,6 @@ BEGIN
 	SELECT CAST(@@ROWCOUNT AS BIT) AS Success;
 END
 GO
+
 
 

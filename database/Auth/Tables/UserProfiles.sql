@@ -7,11 +7,11 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserProfiles')
 BEGIN
 	CREATE TABLE UserProfiles (
-		Id UNIQUEIDENTIFIER PRIMARY KEY,
+		Id INT PRIMARY KEY,
 
 		-- Personal Information
 		FullName NVARCHAR(255) NOT NULL,
-		EmailID NVARCHAR(255) NULL,
+		Email NVARCHAR(255) NULL,
 		MobileNumber NVARCHAR(10) NOT NULL,
 
 		-- School Information
@@ -36,9 +36,13 @@ BEGIN
 
 	CREATE INDEX IX_UserProfiles_SchoolName ON UserProfiles(SchoolName);
 	CREATE INDEX IX_UserProfiles_PassoutYear ON UserProfiles(PassoutYear);
-	CREATE INDEX IX_UserProfiles_EmailID ON UserProfiles(EmailID);
+	CREATE INDEX IX_UserProfiles_Email ON UserProfiles(Email);
 
-	PRINT 'UserProfiles table created successfully.';
+	-- Foreign key to Users table
+	ALTER TABLE UserProfiles ADD CONSTRAINT FK_UserProfiles_Users
+		FOREIGN KEY (Id) REFERENCES Users(Id) ON DELETE CASCADE;
+
+	PRINT 'UserProfiles table created successfully.'
 END
 ELSE
 BEGIN

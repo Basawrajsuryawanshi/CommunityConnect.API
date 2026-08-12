@@ -25,7 +25,7 @@ BEGIN
 	SET NOCOUNT ON;
 
 	SELECT 
-		Id, FullName, EmailID, MobileNumber,
+		Id, FullName, Email, MobileNumber,
 		SchoolName, State, SchoolRegion, PassoutYear,
 		Role, University, CurrentState, CurrentDistrict,
 		BloodGroup, CreatedAt, UpdatedAt

@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_CreateRefre
 GO
 
 CREATE PROCEDURE sp_CreateRefreshToken
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@Token NVARCHAR(500),
 	@ExpiresAt DATETIME2,
 	@CreatedByIp NVARCHAR(50) = NULL
@@ -43,3 +43,4 @@ BEGIN
 	WHERE Id = @TokenId;
 END
 GO
+

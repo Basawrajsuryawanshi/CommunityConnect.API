@@ -31,10 +31,21 @@ namespace CommunityConnect.Auth.Infrastructure.Services
                 throw new Exception("User with this email already exists");
             }
 
-            // Create user using stored procedure
+            // Create user and user profile using stored procedure
             var user = await _authDatabase.CreateUserAsync(
                 email: request.Email,
                 passwordHash: HashPassword(request.Password),
+                fullName: request.FullName,
+                mobileNumber: request.MobileNumber,
+                schoolName: request.SchoolName,
+                state: request.State,
+                schoolRegion: request.SchoolRegion,
+                passoutYear: request.PassoutYear,
+                role: request.Role,
+                university: request.University,
+                currentState: request.CurrentState,
+                currentDistrict: request.CurrentDistrict,
+                bloodGroup: request.BloodGroup,
                 emailVerified: false
             );
 
@@ -123,7 +134,7 @@ namespace CommunityConnect.Auth.Infrastructure.Services
             );
         }
 
-        public async Task LogoutAsync(Guid userId)
+        public async Task LogoutAsync(int userId)
         {
             // Revoke all user tokens using stored procedure
             await _authDatabase.RevokeAllUserTokensAsync(userId);
@@ -160,7 +171,7 @@ namespace CommunityConnect.Auth.Infrastructure.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private async Task<RefreshToken> GenerateRefreshTokenAsync(Guid userId, string ipAddress)
+        private async Task<RefreshToken> GenerateRefreshTokenAsync(int userId, string ipAddress)
         {
             var tokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
             var expiresAt = DateTime.UtcNow.AddDays(7);

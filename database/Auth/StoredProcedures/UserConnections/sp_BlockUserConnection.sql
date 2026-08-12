@@ -14,8 +14,8 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_BlockUserCo
 GO
 
 CREATE PROCEDURE sp_BlockUserConnection
-	@UserId UNIQUEIDENTIFIER,
-	@ConnectedUserId UNIQUEIDENTIFIER
+	@UserId INT,
+	@ConnectedUserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -38,5 +38,6 @@ BEGIN
 	WHERE Id = SCOPE_IDENTITY();
 END
 GO
+
 
 

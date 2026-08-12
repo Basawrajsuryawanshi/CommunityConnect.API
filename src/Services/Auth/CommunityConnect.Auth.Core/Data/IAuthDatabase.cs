@@ -13,11 +13,22 @@ namespace CommunityConnect.Auth.Core.Data
         // ============================================
 
         /// <summary>
-        /// Creates a new user using sp_CreateUser stored procedure
+        /// Creates a new user using sp_CreateUser stored procedure and user profile using sp_CreateUserProfile
         /// </summary>
         Task<User> CreateUserAsync(
             string email,
             string passwordHash,
+            string fullName,
+            string mobileNumber,
+            string schoolName,
+            string state,
+            string schoolRegion,
+            int passoutYear,
+            string role,
+            string university,
+            string currentState,
+            string currentDistrict,
+            string bloodGroup,
             bool emailVerified = false,
             string? emailVerificationToken = null,
             DateTime? emailVerificationExpiry = null);
@@ -30,12 +41,12 @@ namespace CommunityConnect.Auth.Core.Data
         /// <summary>
         /// Gets user by ID using sp_GetUserById stored procedure
         /// </summary>
-        Task<User?> GetUserByIdAsync(Guid userId);
+        Task<User?> GetUserByIdAsync(int userId);
 
         /// <summary>
         /// Updates user's last login timestamp using sp_UpdateLastLogin stored procedure
         /// </summary>
-        Task UpdateLastLoginAsync(Guid userId, DateTime lastLoginAt);
+        Task UpdateLastLoginAsync(int userId, DateTime lastLoginAt);
 
         /// <summary>
         /// Updates user's email verification status using sp_VerifyEmail stored procedure
@@ -45,17 +56,17 @@ namespace CommunityConnect.Auth.Core.Data
         /// <summary>
         /// Updates user's password using sp_UpdatePassword stored procedure
         /// </summary>
-        Task<bool> UpdatePasswordAsync(Guid userId, string newPasswordHash);
+        Task<bool> UpdatePasswordAsync(int userId, string newPasswordHash);
 
         /// <summary>
         /// Sets password reset token using sp_SetPasswordResetToken stored procedure
         /// </summary>
-        Task<bool> SetPasswordResetTokenAsync(Guid userId, string resetToken, DateTime expiry);
+        Task<bool> SetPasswordResetTokenAsync(int userId, string resetToken, DateTime expiry);
 
         /// <summary>
         /// Soft delete user using sp_DeleteUser stored procedure
         /// </summary>
-        Task<bool> DeleteUserAsync(Guid userId);
+        Task<bool> DeleteUserAsync(int userId);
 
         // ============================================
         // REFRESH TOKEN OPERATIONS
@@ -65,7 +76,7 @@ namespace CommunityConnect.Auth.Core.Data
         /// Creates a refresh token using sp_CreateRefreshToken stored procedure
         /// </summary>
         Task<RefreshToken> CreateRefreshTokenAsync(
-            Guid userId,
+            int userId,
             string token,
             DateTime expiresAt,
             string? createdByIp = null);
@@ -83,7 +94,7 @@ namespace CommunityConnect.Auth.Core.Data
         /// <summary>
         /// Revokes all refresh tokens for a user using sp_RevokeAllUserTokens stored procedure
         /// </summary>
-        Task<int> RevokeAllUserTokensAsync(Guid userId);
+        Task<int> RevokeAllUserTokensAsync(int userId);
 
         // ============================================
         // OAUTH PROVIDER OPERATIONS
@@ -93,7 +104,7 @@ namespace CommunityConnect.Auth.Core.Data
         /// Creates or updates OAuth provider using sp_UpsertOAuthProvider stored procedure
         /// </summary>
         Task<OAuthProvider> UpsertOAuthProviderAsync(
-            Guid userId,
+            int userId,
             string provider,
             string providerUserId,
             string? accessToken = null,
@@ -109,5 +120,27 @@ namespace CommunityConnect.Auth.Core.Data
         /// Gets user by OAuth provider using sp_GetUserByOAuthProvider stored procedure
         /// </summary>
         Task<User?> GetUserByOAuthProviderAsync(string provider, string providerUserId);
+
+        // ============================================
+        // USER PROFILE OPERATIONS
+        // ============================================
+
+        /// <summary>
+        /// Creates a new user profile using sp_CreateUserProfile stored procedure
+        /// </summary>
+        Task<UserProfile> CreateUserProfileAsync(
+            int id,
+            string fullName,
+            string email,
+            string mobileNumber,
+            string schoolName,
+            string state,
+            string schoolRegion,
+            int passoutYear,
+            string role,
+            string university,
+            string currentState,
+            string currentDistrict,
+            string bloodGroup);
     }
 }
