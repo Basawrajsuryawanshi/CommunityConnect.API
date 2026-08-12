@@ -15,6 +15,9 @@ GO
 
 CREATE PROCEDURE sp_SearchUserProfiles
 	@SearchTerm NVARCHAR(200),
+	@SchoolName NVARCHAR(255) = NULL,
+	@PassoutYear INT = NULL,
+	@Role NVARCHAR(50) = NULL,
 	@Limit INT = 50,
 	@Offset INT = 0
 AS
@@ -22,19 +25,24 @@ BEGIN
 	SET NOCOUNT ON;
 
 	SELECT 
-		Id, FirstName, LastName, DisplayName, AvatarUrl,
-		JNV, Batch, City, State, IsPublic
+		Id, FullName, EmailID, MobileNumber,
+		SchoolName, State, SchoolRegion, PassoutYear,
+		Role, University, CurrentState, CurrentDistrict,
+		BloodGroup, CreatedAt, UpdatedAt
 	FROM UserProfiles
 	WHERE 
-		IsPublic = 1
-		AND (
-			DisplayName LIKE '%' + @SearchTerm + '%'
-			OR FirstName LIKE '%' + @SearchTerm + '%'
-			OR LastName LIKE '%' + @SearchTerm + '%'
-			OR JNV LIKE '%' + @SearchTerm + '%'
-			OR Batch LIKE '%' + @SearchTerm + '%'
+		(
+			@SearchTerm IS NULL OR @SearchTerm = '' OR
+			FullName LIKE '%' + @SearchTerm + '%'
+			OR SchoolName LIKE '%' + @SearchTerm + '%'
+			OR Role LIKE '%' + @SearchTerm + '%'
+			OR University LIKE '%' + @SearchTerm + '%'
+			OR CAST(PassoutYear AS NVARCHAR) LIKE '%' + @SearchTerm + '%'
 		)
-	ORDER BY DisplayName
+		AND (@SchoolName IS NULL OR SchoolName = @SchoolName)
+		AND (@PassoutYear IS NULL OR PassoutYear = @PassoutYear)
+		AND (@Role IS NULL OR Role = @Role)
+	ORDER BY FullName
 	OFFSET @Offset ROWS
 	FETCH NEXT @Limit ROWS ONLY;
 END

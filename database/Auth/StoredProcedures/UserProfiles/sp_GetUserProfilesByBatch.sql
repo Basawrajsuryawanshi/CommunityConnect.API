@@ -1,5 +1,5 @@
 -- ============================================
--- sp_GetUserProfilesByBatch: Gets user profiles by batch
+-- sp_GetUserProfilesByPassoutYear: Gets user profiles by passout year
 -- ============================================
 
 USE AuthDB;
@@ -13,8 +13,12 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserProf
 	DROP PROCEDURE sp_GetUserProfilesByBatch;
 GO
 
-CREATE PROCEDURE sp_GetUserProfilesByBatch
-	@Batch NVARCHAR(10),
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserProfilesByPassoutYear')
+	DROP PROCEDURE sp_GetUserProfilesByPassoutYear;
+GO
+
+CREATE PROCEDURE sp_GetUserProfilesByPassoutYear
+	@PassoutYear INT,
 	@Limit INT = 50,
 	@Offset INT = 0
 AS
@@ -22,13 +26,14 @@ BEGIN
 	SET NOCOUNT ON;
 
 	SELECT 
-		Id, FirstName, LastName, DisplayName, AvatarUrl,
-		JNV, Batch, City, State
+		Id, FullName, EmailID, MobileNumber,
+		SchoolName, State, SchoolRegion, PassoutYear,
+		Role, University, CurrentState, CurrentDistrict,
+		BloodGroup, CreatedAt, UpdatedAt
 	FROM UserProfiles
 	WHERE 
-		IsPublic = 1
-		AND Batch = @Batch
-	ORDER BY JNV, DisplayName
+		PassoutYear = @PassoutYear
+	ORDER BY SchoolName, FullName
 	OFFSET @Offset ROWS
 	FETCH NEXT @Limit ROWS ONLY;
 END

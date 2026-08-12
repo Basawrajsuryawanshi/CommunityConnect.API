@@ -1,5 +1,5 @@
 -- ============================================
--- sp_GetUserProfilesByJNV: Gets user profiles by JNV
+-- sp_GetUserProfilesBySchool: Gets user profiles by school name
 -- ============================================
 
 USE AuthDB;
@@ -13,8 +13,13 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserProf
 	DROP PROCEDURE sp_GetUserProfilesByJNV;
 GO
 
-CREATE PROCEDURE sp_GetUserProfilesByJNV
-	@JNV NVARCHAR(200),
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserProfilesBySchool')
+	DROP PROCEDURE sp_GetUserProfilesBySchool;
+GO
+
+CREATE PROCEDURE sp_GetUserProfilesBySchool
+	@SchoolName NVARCHAR(255),
+	@PassoutYear INT = NULL,
 	@Limit INT = 50,
 	@Offset INT = 0
 AS
@@ -22,13 +27,15 @@ BEGIN
 	SET NOCOUNT ON;
 
 	SELECT 
-		Id, FirstName, LastName, DisplayName, AvatarUrl,
-		JNV, Batch, City, State
+		Id, FullName, EmailID, MobileNumber,
+		SchoolName, State, SchoolRegion, PassoutYear,
+		Role, University, CurrentState, CurrentDistrict,
+		BloodGroup, CreatedAt, UpdatedAt
 	FROM UserProfiles
 	WHERE 
-		IsPublic = 1
-		AND JNV = @JNV
-	ORDER BY Batch DESC, DisplayName
+		SchoolName = @SchoolName
+		AND (@PassoutYear IS NULL OR PassoutYear = @PassoutYear)
+	ORDER BY PassoutYear DESC, FullName
 	OFFSET @Offset ROWS
 	FETCH NEXT @Limit ROWS ONLY;
 END
