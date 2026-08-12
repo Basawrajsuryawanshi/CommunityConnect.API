@@ -14,9 +14,9 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_UpdateUserP
 GO
 
 CREATE PROCEDURE sp_UpdateUserProfile
-	@Id UNIQUEIDENTIFIER,
+	@Id INT,
 	@FullName NVARCHAR(255) = NULL,
-	@EmailID NVARCHAR(255) = NULL,
+	@Email NVARCHAR(255) = NULL,
 	@MobileNumber NVARCHAR(10) = NULL,
 	@SchoolName NVARCHAR(255) = NULL,
 	@State NVARCHAR(100) = NULL,
@@ -36,7 +36,7 @@ BEGIN
 	UPDATE UserProfiles
 	SET 
 		FullName = COALESCE(@FullName, FullName),
-		EmailID = COALESCE(@EmailID, EmailID),
+		Email = COALESCE(@Email, Email),
 		MobileNumber = COALESCE(@MobileNumber, MobileNumber),
 		SchoolName = COALESCE(@SchoolName, SchoolName),
 		State = COALESCE(@State, State),
@@ -52,11 +52,12 @@ BEGIN
 
 	-- Return updated profile
 	SELECT 
-		Id, FullName, EmailID, MobileNumber, SchoolName,
+		Id, FullName, Email, MobileNumber, SchoolName,
 		PassoutYear, Role, University, UpdatedAt
 	FROM UserProfiles
 	WHERE Id = @Id;
 END
 GO
+
 
 

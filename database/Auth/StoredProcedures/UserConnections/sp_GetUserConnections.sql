@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserConn
 GO
 
 CREATE PROCEDURE sp_GetUserConnections
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@Status NVARCHAR(20) = NULL
 AS
 BEGIN
@@ -37,5 +37,6 @@ BEGIN
 	ORDER BY uc.RequestedAt DESC;
 END
 GO
+
 
 

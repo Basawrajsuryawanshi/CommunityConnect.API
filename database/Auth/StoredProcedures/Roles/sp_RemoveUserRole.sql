@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_RemoveUserR
 GO
 
 CREATE PROCEDURE sp_RemoveUserRole
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@RoleId INT
 AS
 BEGIN
@@ -26,5 +26,6 @@ BEGIN
 	SELECT CAST(@@ROWCOUNT AS BIT) AS Success;
 END
 GO
+
 
 

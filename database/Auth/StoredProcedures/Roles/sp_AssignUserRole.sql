@@ -14,9 +14,9 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_AssignUserR
 GO
 
 CREATE PROCEDURE sp_AssignUserRole
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@RoleId INT,
-	@AssignedBy UNIQUEIDENTIFIER = NULL,
+	@AssignedBy INT = NULL,
 	@ExpiresAt DATETIME2 = NULL
 AS
 BEGIN
@@ -57,5 +57,6 @@ BEGIN
 	WHERE ura.Id = @AssignmentId;
 END
 GO
+
 
 

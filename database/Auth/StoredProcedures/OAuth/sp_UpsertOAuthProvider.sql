@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_UpsertOAuth
 GO
 
 CREATE PROCEDURE sp_UpsertOAuthProvider
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@Provider NVARCHAR(50),
 	@ProviderUserId NVARCHAR(255),
 	@AccessToken NVARCHAR(MAX) = NULL,
@@ -69,3 +69,4 @@ BEGIN
 	WHERE Id = @OAuthId;
 END
 GO
+

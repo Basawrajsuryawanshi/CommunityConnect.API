@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_UpsertUserP
 GO
 
 CREATE PROCEDURE sp_UpsertUserPreferences
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@EmailNotifications BIT = 1,
 	@PushNotifications BIT = 1,
 	@SmsNotifications BIT = 0,
@@ -75,5 +75,6 @@ BEGIN
 	WHERE Id = @PreferenceId;
 END
 GO
+
 
 

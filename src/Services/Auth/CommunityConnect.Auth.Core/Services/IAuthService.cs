@@ -8,7 +8,7 @@ namespace CommunityConnect.Auth.Core.Services
         Task<AuthResponse> LoginAsync(LoginRequest request);
         Task<AuthResponse> GoogleLoginAsync(GoogleLoginRequest request);
         Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request);
-        Task LogoutAsync(Guid userId);
+        Task LogoutAsync(int userId);
         Task<bool> ValidateTokenAsync(string token);
     }
 }

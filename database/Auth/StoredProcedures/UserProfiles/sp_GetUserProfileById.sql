@@ -14,13 +14,13 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserProf
 GO
 
 CREATE PROCEDURE sp_GetUserProfileById
-	@Id UNIQUEIDENTIFIER
+	@Id INT
 AS
 BEGIN
 	SET NOCOUNT ON;
 
 	SELECT 
-		Id, FullName, EmailID, MobileNumber,
+		Id, FullName, Email, MobileNumber,
 		SchoolName, State, SchoolRegion, PassoutYear,
 		Role, University, CurrentState, CurrentDistrict,
 		BloodGroup, CreatedAt, UpdatedAt
@@ -28,4 +28,5 @@ BEGIN
 	WHERE Id = @Id;
 END
 GO
+
 

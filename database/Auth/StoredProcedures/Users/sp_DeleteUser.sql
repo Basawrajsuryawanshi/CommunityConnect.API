@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_DeleteUser'
 GO
 
 CREATE PROCEDURE sp_DeleteUser
-	@UserId UNIQUEIDENTIFIER
+	@UserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -28,3 +28,4 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+

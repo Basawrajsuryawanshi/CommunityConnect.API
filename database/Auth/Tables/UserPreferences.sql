@@ -8,7 +8,7 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserPreferences')
 BEGIN
 	CREATE TABLE UserPreferences (
 		Id INT IDENTITY(1,1) PRIMARY KEY,
-		UserId UNIQUEIDENTIFIER NOT NULL UNIQUE,
+		UserId INT NOT NULL UNIQUE,
 		EmailNotifications BIT NOT NULL DEFAULT 1,
 		PushNotifications BIT NOT NULL DEFAULT 1,
 		SmsNotifications BIT NOT NULL DEFAULT 0,

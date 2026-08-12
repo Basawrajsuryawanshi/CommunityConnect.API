@@ -8,8 +8,8 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserConnections')
 BEGIN
 	CREATE TABLE UserConnections (
 		Id INT IDENTITY(1,1) PRIMARY KEY,
-		UserId UNIQUEIDENTIFIER NOT NULL,
-		ConnectedUserId UNIQUEIDENTIFIER NOT NULL,
+		UserId INT NOT NULL,
+		ConnectedUserId INT NOT NULL,
 		Status NVARCHAR(20) NOT NULL, -- 'Pending', 'Accepted', 'Blocked'
 		RequestedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
 		AcceptedAt DATETIME2 NULL,

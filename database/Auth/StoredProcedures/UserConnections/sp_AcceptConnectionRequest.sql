@@ -15,7 +15,7 @@ GO
 
 CREATE PROCEDURE sp_AcceptConnectionRequest
 	@ConnectionId INT,
-	@ConnectedUserId UNIQUEIDENTIFIER
+	@ConnectedUserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -38,5 +38,6 @@ BEGIN
 	WHERE Id = @ConnectionId;
 END
 GO
+
 
 

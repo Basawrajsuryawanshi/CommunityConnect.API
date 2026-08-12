@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserRole
 GO
 
 CREATE PROCEDURE sp_GetUserRoles
-	@UserId UNIQUEIDENTIFIER
+	@UserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -37,5 +37,6 @@ BEGIN
 	ORDER BY ura.AssignedAt DESC;
 END
 GO
+
 
 

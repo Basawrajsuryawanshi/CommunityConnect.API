@@ -4,7 +4,18 @@ namespace CommunityConnect.Contracts.Auth
 
     public record RegisterRequest(
         string Email,
-        string Password
+        string Password,
+        string FullName,
+        string MobileNumber,
+        string SchoolName,
+        string State,
+        string SchoolRegion,
+        int PassoutYear,
+        string Role,
+        string University,
+        string CurrentState,
+        string CurrentDistrict,
+        string BloodGroup
     );
 
     public record GoogleLoginRequest(string IdToken);
@@ -12,7 +23,7 @@ namespace CommunityConnect.Contracts.Auth
     public record RefreshTokenRequest(string RefreshToken);
 
     public record AuthResponse(
-        Guid UserId,
+        int UserId,
         string Email,
         string AccessToken,
         string RefreshToken,

@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_GetUserPref
 GO
 
 CREATE PROCEDURE sp_GetUserPreferences
-	@UserId UNIQUEIDENTIFIER
+	@UserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -27,5 +27,6 @@ BEGIN
 	WHERE UserId = @UserId;
 END
 GO
+
 
 

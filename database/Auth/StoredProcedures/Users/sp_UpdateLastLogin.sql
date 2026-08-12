@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_UpdateLastL
 GO
 
 CREATE PROCEDURE sp_UpdateLastLogin
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@LastLoginAt DATETIME2
 AS
 BEGIN
@@ -26,3 +26,4 @@ BEGIN
 	WHERE Id = @UserId AND IsDeleted = 0;
 END
 GO
+

@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_UpdatePassw
 GO
 
 CREATE PROCEDURE sp_UpdatePassword
-	@UserId UNIQUEIDENTIFIER,
+	@UserId INT,
 	@NewPasswordHash NVARCHAR(500)
 AS
 BEGIN
@@ -30,3 +30,4 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+

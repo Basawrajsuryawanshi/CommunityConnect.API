@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_RevokeAllUs
 GO
 
 CREATE PROCEDURE sp_RevokeAllUserTokens
-	@UserId UNIQUEIDENTIFIER
+	@UserId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -27,3 +27,4 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+

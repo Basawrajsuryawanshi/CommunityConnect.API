@@ -72,7 +72,7 @@ namespace CommunityConnect.Auth.API.Controllers
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] Guid userId)
+        public async Task<IActionResult> Logout([FromBody] int userId)
         {
             try
             {

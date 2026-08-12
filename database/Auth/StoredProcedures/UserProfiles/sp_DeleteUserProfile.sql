@@ -14,7 +14,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_DeleteUserP
 GO
 
 CREATE PROCEDURE sp_DeleteUserProfile
-	@Id UNIQUEIDENTIFIER
+	@Id INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -25,5 +25,6 @@ BEGIN
 	SELECT CAST(@@ROWCOUNT AS BIT) AS Success;
 END
 GO
+
 
 

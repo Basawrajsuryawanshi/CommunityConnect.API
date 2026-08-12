@@ -27,7 +27,7 @@ BEGIN
 	SET NOCOUNT ON;
 	SET QUOTED_IDENTIFIER ON;
 
-	DECLARE @UserId UNIQUEIDENTIFIER = NEWID();
+	DECLARE @UserId INT;
 	DECLARE @Now DATETIME2 = GETUTCDATE();
 
 	-- Check if email already exists
@@ -38,15 +38,17 @@ BEGIN
 	END
 
 	INSERT INTO Users (
-		Id, Email, PasswordHash, EmailVerified, 
+		Email, PasswordHash, EmailVerified, 
 		EmailVerificationToken, EmailVerificationExpiry,
 		IsActive, IsDeleted, CreatedAt, UpdatedAt
 	)
 	VALUES (
-		@UserId, @Email, @PasswordHash, @EmailVerified,
+		@Email, @PasswordHash, @EmailVerified,
 		@EmailVerificationToken, @EmailVerificationExpiry,
 		1, 0, @Now, @Now
 	);
+
+	SET @UserId = SCOPE_IDENTITY();
 
 	-- Return the created user
 	SELECT 
@@ -58,3 +60,4 @@ BEGIN
 	WHERE Id = @UserId;
 END
 GO
+
