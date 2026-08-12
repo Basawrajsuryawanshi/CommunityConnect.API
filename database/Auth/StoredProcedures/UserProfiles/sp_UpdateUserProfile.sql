@@ -15,28 +15,18 @@ GO
 
 CREATE PROCEDURE sp_UpdateUserProfile
 	@Id UNIQUEIDENTIFIER,
-	@FirstName NVARCHAR(100) = NULL,
-	@LastName NVARCHAR(100) = NULL,
-	@DisplayName NVARCHAR(200) = NULL,
-	@AvatarUrl NVARCHAR(500) = NULL,
-	@Bio NVARCHAR(MAX) = NULL,
-	@DateOfBirth DATE = NULL,
-	@Gender NVARCHAR(20) = NULL,
-	@PhoneNumber NVARCHAR(20) = NULL,
-	@JNV NVARCHAR(200) = NULL,
-	@Batch NVARCHAR(10) = NULL,
-	@StudentId NVARCHAR(50) = NULL,
-	@AddressLine1 NVARCHAR(255) = NULL,
-	@AddressLine2 NVARCHAR(255) = NULL,
-	@City NVARCHAR(100) = NULL,
+	@FullName NVARCHAR(255) = NULL,
+	@EmailID NVARCHAR(255) = NULL,
+	@MobileNumber NVARCHAR(10) = NULL,
+	@SchoolName NVARCHAR(255) = NULL,
 	@State NVARCHAR(100) = NULL,
-	@Country NVARCHAR(100) = NULL,
-	@PostalCode NVARCHAR(20) = NULL,
-	@LinkedInUrl NVARCHAR(500) = NULL,
-	@TwitterHandle NVARCHAR(100) = NULL,
-	@GitHubUsername NVARCHAR(100) = NULL,
-	@IsProfileComplete BIT = NULL,
-	@IsPublic BIT = NULL
+	@SchoolRegion NVARCHAR(100) = NULL,
+	@PassoutYear INT = NULL,
+	@Role NVARCHAR(50) = NULL,
+	@University NVARCHAR(255) = NULL,
+	@CurrentState NVARCHAR(100) = NULL,
+	@CurrentDistrict NVARCHAR(100) = NULL,
+	@BloodGroup NVARCHAR(5) = NULL
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -45,34 +35,25 @@ BEGIN
 
 	UPDATE UserProfiles
 	SET 
-		FirstName = COALESCE(@FirstName, FirstName),
-		LastName = COALESCE(@LastName, LastName),
-		DisplayName = COALESCE(@DisplayName, DisplayName),
-		AvatarUrl = COALESCE(@AvatarUrl, AvatarUrl),
-		Bio = COALESCE(@Bio, Bio),
-		DateOfBirth = COALESCE(@DateOfBirth, DateOfBirth),
-		Gender = COALESCE(@Gender, Gender),
-		PhoneNumber = COALESCE(@PhoneNumber, PhoneNumber),
-		JNV = COALESCE(@JNV, JNV),
-		Batch = COALESCE(@Batch, Batch),
-		StudentId = COALESCE(@StudentId, StudentId),
-		AddressLine1 = COALESCE(@AddressLine1, AddressLine1),
-		AddressLine2 = COALESCE(@AddressLine2, AddressLine2),
-		City = COALESCE(@City, City),
+		FullName = COALESCE(@FullName, FullName),
+		EmailID = COALESCE(@EmailID, EmailID),
+		MobileNumber = COALESCE(@MobileNumber, MobileNumber),
+		SchoolName = COALESCE(@SchoolName, SchoolName),
 		State = COALESCE(@State, State),
-		Country = COALESCE(@Country, Country),
-		PostalCode = COALESCE(@PostalCode, PostalCode),
-		LinkedInUrl = COALESCE(@LinkedInUrl, LinkedInUrl),
-		TwitterHandle = COALESCE(@TwitterHandle, TwitterHandle),
-		GitHubUsername = COALESCE(@GitHubUsername, GitHubUsername),
-		IsProfileComplete = COALESCE(@IsProfileComplete, IsProfileComplete),
-		IsPublic = COALESCE(@IsPublic, IsPublic),
+		SchoolRegion = COALESCE(@SchoolRegion, SchoolRegion),
+		PassoutYear = COALESCE(@PassoutYear, PassoutYear),
+		Role = COALESCE(@Role, Role),
+		University = COALESCE(@University, University),
+		CurrentState = COALESCE(@CurrentState, CurrentState),
+		CurrentDistrict = COALESCE(@CurrentDistrict, CurrentDistrict),
+		BloodGroup = COALESCE(@BloodGroup, BloodGroup),
 		UpdatedAt = @Now
 	WHERE Id = @Id;
 
 	-- Return updated profile
 	SELECT 
-		Id, FirstName, LastName, DisplayName, UpdatedAt
+		Id, FullName, EmailID, MobileNumber, SchoolName,
+		PassoutYear, Role, University, UpdatedAt
 	FROM UserProfiles
 	WHERE Id = @Id;
 END

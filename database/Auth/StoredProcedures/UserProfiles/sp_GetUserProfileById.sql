@@ -20,11 +20,10 @@ BEGIN
 	SET NOCOUNT ON;
 
 	SELECT 
-		Id, FirstName, LastName, DisplayName, AvatarUrl, Bio,
-		DateOfBirth, Gender, PhoneNumber, JNV, Batch, StudentId,
-		AddressLine1, AddressLine2, City, State, Country, PostalCode,
-		LinkedInUrl, TwitterHandle, GitHubUsername,
-		IsProfileComplete, IsPublic, CreatedAt, UpdatedAt
+		Id, FullName, EmailID, MobileNumber,
+		SchoolName, State, SchoolRegion, PassoutYear,
+		Role, University, CurrentState, CurrentDistrict,
+		BloodGroup, CreatedAt, UpdatedAt
 	FROM UserProfiles
 	WHERE Id = @Id;
 END

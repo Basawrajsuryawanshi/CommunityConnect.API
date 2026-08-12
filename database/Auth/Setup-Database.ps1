@@ -189,16 +189,16 @@ catch {
 # Verify installation
 Write-Host "`nVerifying installation..." -ForegroundColor Yellow
 try {
-	$tableQuery = "USE AuthDB; SELECT COUNT(*) AS TableCount FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';"
-	$spQuery = "USE AuthDB; SELECT COUNT(*) AS SPCount FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE';"
+	$tableQuery = "SELECT COUNT(*) AS TableCount FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';"
+	$spQuery = "SELECT COUNT(*) AS SPCount FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE';"
 
-	$tableCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $tableQuery -ErrorAction Stop).TableCount
-	$spCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $spQuery -ErrorAction Stop).SPCount
+	$tableCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Database "AuthDB" -Query $tableQuery -ErrorAction Stop).TableCount
+	$spCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Database "AuthDB" -Query $spQuery -ErrorAction Stop).SPCount
 
 	Write-Host "  Tables created: $tableCount (expected: 8)" -ForegroundColor Cyan
-	Write-Host "  Stored procedures created: $spCount (expected: 34)" -ForegroundColor Cyan
+	Write-Host "  Stored procedures created: $spCount (expected: 37)" -ForegroundColor Cyan
 
-	if ($tableCount -eq 8 -and $spCount -eq 34) {
+	if ($tableCount -eq 8 -and $spCount -eq 37) {
 		Write-Host "✓ Installation verified successfully" -ForegroundColor Green
 	}
 	else {

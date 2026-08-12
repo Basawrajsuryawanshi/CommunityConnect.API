@@ -6,11 +6,11 @@
 # - User Authentication (8 procedures)
 # - Refresh Tokens (4 procedures)
 # - OAuth Providers (3 procedures)
-# - User Profiles (7 procedures)
+# - User Profiles (10 procedures)
 # - Roles (4 procedures)
 # - User Preferences (2 procedures)
 # - User Connections (6 procedures)
-# Total: 34 stored procedures
+# Total: 37 stored procedures
 # ============================================
 
 param(
@@ -136,18 +136,19 @@ foreach ($proc in $oauthProcs) {
 Write-Host ""
 
 # ============================================
-# USER PROFILE STORED PROCEDURES (7 procedures)
+# USER PROFILE STORED PROCEDURES (10 procedures)
 # ============================================
 Write-Host "Deploying UserProfile stored procedures..." -ForegroundColor Cyan
 
 $userProfileProcs = @(
 	@{Path="StoredProcedures\UserProfiles\sp_CreateUserProfile.sql"; Name="sp_CreateUserProfile"},
 	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfileById.sql"; Name="sp_GetUserProfileById"},
+	@{Path="StoredProcedures\UserProfiles\sp_GetAllUserProfiles.sql"; Name="sp_GetAllUserProfiles"},
 	@{Path="StoredProcedures\UserProfiles\sp_UpdateUserProfile.sql"; Name="sp_UpdateUserProfile"},
 	@{Path="StoredProcedures\UserProfiles\sp_DeleteUserProfile.sql"; Name="sp_DeleteUserProfile"},
 	@{Path="StoredProcedures\UserProfiles\sp_SearchUserProfiles.sql"; Name="sp_SearchUserProfiles"},
-	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfilesByJNV.sql"; Name="sp_GetUserProfilesByJNV"},
-	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfilesByBatch.sql"; Name="sp_GetUserProfilesByBatch"}
+	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfilesByJNV.sql"; Name="sp_GetUserProfilesBySchool"},
+	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfilesByBatch.sql"; Name="sp_GetUserProfilesByPassoutYear"}
 )
 
 foreach ($proc in $userProfileProcs) {
@@ -228,7 +229,7 @@ Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "Deployment Summary" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "Total procedures: 34" -ForegroundColor Yellow
+Write-Host "Total procedures: 37" -ForegroundColor Yellow
 Write-Host "Successfully deployed: $successCount" -ForegroundColor Green
 Write-Host "Failed: $errorCount" -ForegroundColor $(if ($errorCount -gt 0) { "Red" } else { "Green" })
 Write-Host "============================================" -ForegroundColor Cyan
