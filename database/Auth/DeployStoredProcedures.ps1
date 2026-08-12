@@ -1,6 +1,16 @@
 # ============================================
 # CommunityConnect Auth Database - Stored Procedures Deployment Script
 # PowerShell script to deploy all stored procedures from individual files
+# 
+# Includes:
+# - User Authentication (8 procedures)
+# - Refresh Tokens (4 procedures)
+# - OAuth Providers (3 procedures)
+# - User Profiles (7 procedures)
+# - Roles (4 procedures)
+# - User Preferences (2 procedures)
+# - User Connections (6 procedures)
+# Total: 34 stored procedures
 # ============================================
 
 param(
@@ -124,10 +134,101 @@ foreach ($proc in $oauthProcs) {
 }
 
 Write-Host ""
+
+# ============================================
+# USER PROFILE STORED PROCEDURES (7 procedures)
+# ============================================
+Write-Host "Deploying UserProfile stored procedures..." -ForegroundColor Cyan
+
+$userProfileProcs = @(
+	@{Path="StoredProcedures\UserProfiles\sp_CreateUserProfile.sql"; Name="sp_CreateUserProfile"},
+	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfileById.sql"; Name="sp_GetUserProfileById"},
+	@{Path="StoredProcedures\UserProfiles\sp_UpdateUserProfile.sql"; Name="sp_UpdateUserProfile"},
+	@{Path="StoredProcedures\UserProfiles\sp_DeleteUserProfile.sql"; Name="sp_DeleteUserProfile"},
+	@{Path="StoredProcedures\UserProfiles\sp_SearchUserProfiles.sql"; Name="sp_SearchUserProfiles"},
+	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfilesByJNV.sql"; Name="sp_GetUserProfilesByJNV"},
+	@{Path="StoredProcedures\UserProfiles\sp_GetUserProfilesByBatch.sql"; Name="sp_GetUserProfilesByBatch"}
+)
+
+foreach ($proc in $userProfileProcs) {
+	if (Execute-SqlFile -FilePath $proc.Path -ProcedureName $proc.Name) {
+		$successCount++
+	} else {
+		$errorCount++
+	}
+}
+
+Write-Host ""
+
+# ============================================
+# ROLES STORED PROCEDURES (4 procedures)
+# ============================================
+Write-Host "Deploying Roles stored procedures..." -ForegroundColor Cyan
+
+$roleProcs = @(
+	@{Path="StoredProcedures\Roles\sp_GetAllRoles.sql"; Name="sp_GetAllRoles"},
+	@{Path="StoredProcedures\Roles\sp_GetUserRoles.sql"; Name="sp_GetUserRoles"},
+	@{Path="StoredProcedures\Roles\sp_AssignUserRole.sql"; Name="sp_AssignUserRole"},
+	@{Path="StoredProcedures\Roles\sp_RemoveUserRole.sql"; Name="sp_RemoveUserRole"}
+)
+
+foreach ($proc in $roleProcs) {
+	if (Execute-SqlFile -FilePath $proc.Path -ProcedureName $proc.Name) {
+		$successCount++
+	} else {
+		$errorCount++
+	}
+}
+
+Write-Host ""
+
+# ============================================
+# USER PREFERENCES STORED PROCEDURES (2 procedures)
+# ============================================
+Write-Host "Deploying UserPreferences stored procedures..." -ForegroundColor Cyan
+
+$userPrefProcs = @(
+	@{Path="StoredProcedures\UserPreferences\sp_GetUserPreferences.sql"; Name="sp_GetUserPreferences"},
+	@{Path="StoredProcedures\UserPreferences\sp_UpsertUserPreferences.sql"; Name="sp_UpsertUserPreferences"}
+)
+
+foreach ($proc in $userPrefProcs) {
+	if (Execute-SqlFile -FilePath $proc.Path -ProcedureName $proc.Name) {
+		$successCount++
+	} else {
+		$errorCount++
+	}
+}
+
+Write-Host ""
+
+# ============================================
+# USER CONNECTIONS STORED PROCEDURES (6 procedures)
+# ============================================
+Write-Host "Deploying UserConnections stored procedures..." -ForegroundColor Cyan
+
+$userConnProcs = @(
+	@{Path="StoredProcedures\UserConnections\sp_CreateConnectionRequest.sql"; Name="sp_CreateConnectionRequest"},
+	@{Path="StoredProcedures\UserConnections\sp_AcceptConnectionRequest.sql"; Name="sp_AcceptConnectionRequest"},
+	@{Path="StoredProcedures\UserConnections\sp_RejectConnectionRequest.sql"; Name="sp_RejectConnectionRequest"},
+	@{Path="StoredProcedures\UserConnections\sp_GetUserConnections.sql"; Name="sp_GetUserConnections"},
+	@{Path="StoredProcedures\UserConnections\sp_GetPendingConnectionRequests.sql"; Name="sp_GetPendingConnectionRequests"},
+	@{Path="StoredProcedures\UserConnections\sp_BlockUserConnection.sql"; Name="sp_BlockUserConnection"}
+)
+
+foreach ($proc in $userConnProcs) {
+	if (Execute-SqlFile -FilePath $proc.Path -ProcedureName $proc.Name) {
+		$successCount++
+	} else {
+		$errorCount++
+	}
+}
+
+Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "Deployment Summary" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "Total procedures: 15" -ForegroundColor Yellow
+Write-Host "Total procedures: 34" -ForegroundColor Yellow
 Write-Host "Successfully deployed: $successCount" -ForegroundColor Green
 Write-Host "Failed: $errorCount" -ForegroundColor $(if ($errorCount -gt 0) { "Red" } else { "Green" })
 Write-Host "============================================" -ForegroundColor Cyan
