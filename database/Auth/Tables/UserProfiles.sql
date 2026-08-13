@@ -1,7 +1,7 @@
 -- ============================================
 -- USER PROFILES TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserProfiles')
@@ -49,3 +49,4 @@ BEGIN
 	PRINT 'UserProfiles table already exists.';
 END
 GO
+

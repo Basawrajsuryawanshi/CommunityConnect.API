@@ -2,7 +2,7 @@
 -- sp_GetUserRoles: Gets all roles assigned to a user
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -37,6 +37,7 @@ BEGIN
 	ORDER BY ura.AssignedAt DESC;
 END
 GO
+
 
 
 

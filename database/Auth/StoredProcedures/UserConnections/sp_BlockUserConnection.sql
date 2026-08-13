@@ -2,7 +2,7 @@
 -- sp_BlockUserConnection: Blocks a user connection
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -38,6 +38,7 @@ BEGIN
 	WHERE Id = SCOPE_IDENTITY();
 END
 GO
+
 
 
 

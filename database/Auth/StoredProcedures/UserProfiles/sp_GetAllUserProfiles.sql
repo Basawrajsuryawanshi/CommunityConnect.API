@@ -2,7 +2,7 @@
 -- sp_GetAllUserProfiles: Gets all user profiles with optional pagination
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -41,4 +41,5 @@ BEGIN
 	SELECT @TotalCount AS TotalCount;
 END
 GO
+
 

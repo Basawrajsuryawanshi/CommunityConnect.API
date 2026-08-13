@@ -2,7 +2,7 @@
 -- sp_RejectConnectionRequest: Rejects a connection request
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -29,6 +29,7 @@ BEGIN
 	SELECT CAST(@@ROWCOUNT AS BIT) AS Success;
 END
 GO
+
 
 
 

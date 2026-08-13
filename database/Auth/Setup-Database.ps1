@@ -102,7 +102,7 @@ Write-Host "✓ Script files found" -ForegroundColor Green
 
 # Check if database exists
 Write-Host "`nChecking if database exists..." -ForegroundColor Yellow
-$dbCheckQuery = "SELECT DB_ID('AuthDB') AS DbId"
+$dbCheckQuery = "SELECT DB_ID('Communityconnect') AS DbId"
 try {
 	$result = Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $dbCheckQuery -ErrorAction Stop
 	$dbExists = $null -ne $result.DbId
@@ -110,7 +110,7 @@ try {
 	if ($dbExists) {
 		if ($Force) {
 			Write-Host "Database exists. Force flag set - will drop and recreate." -ForegroundColor Yellow
-			$dropQuery = "USE master; ALTER DATABASE AuthDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE AuthDB;"
+			$dropQuery = "USE master; ALTER DATABASE Communityconnect SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE Communityconnect;"
 			Invoke-Sqlcmd -ServerInstance $ServerInstance -Query $dropQuery -ErrorAction Stop
 			Write-Host "✓ Existing database dropped" -ForegroundColor Green
 		}
@@ -178,7 +178,7 @@ Write-Host "✓ All tables deployed successfully ($tableSuccess tables)" -Foregr
 # Execute DeployStoredProcedures.ps1
 Write-Host "`nDeploying stored procedures..." -ForegroundColor Yellow
 try {
-	& $spDeployScript -ServerInstance $ServerInstance -Database "AuthDB"
+	& $spDeployScript -ServerInstance $ServerInstance -Database "Communityconnect"
 	Write-Host "✓ Stored procedures deployment completed" -ForegroundColor Green
 }
 catch {
@@ -192,8 +192,8 @@ try {
 	$tableQuery = "SELECT COUNT(*) AS TableCount FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';"
 	$spQuery = "SELECT COUNT(*) AS SPCount FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE = 'PROCEDURE';"
 
-	$tableCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Database "AuthDB" -Query $tableQuery -ErrorAction Stop).TableCount
-	$spCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Database "AuthDB" -Query $spQuery -ErrorAction Stop).SPCount
+	$tableCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Database "Communityconnect" -Query $tableQuery -ErrorAction Stop).TableCount
+	$spCount = (Invoke-Sqlcmd -ServerInstance $ServerInstance -Database "Communityconnect" -Query $spQuery -ErrorAction Stop).SPCount
 
 	Write-Host "  Tables created: $tableCount (expected: 8)" -ForegroundColor Cyan
 	Write-Host "  Stored procedures created: $spCount (expected: 37)" -ForegroundColor Cyan
@@ -214,7 +214,7 @@ Write-Host "`n============================================" -ForegroundColor Cya
 Write-Host "Setup completed successfully!" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "`nConnection String:" -ForegroundColor Yellow
-Write-Host "Data Source=$ServerInstance;Initial Catalog=AuthDB;Integrated Security=True;TrustServerCertificate=True" -ForegroundColor White
+Write-Host "Data Source=$ServerInstance;Initial Catalog=Communityconnect;Integrated Security=True;TrustServerCertificate=True" -ForegroundColor White
 
 Write-Host "`nNext Steps:" -ForegroundColor Yellow
 Write-Host "1. Open the Auth.API project in Visual Studio" -ForegroundColor White

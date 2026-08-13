@@ -2,7 +2,7 @@
 -- sp_GetOAuthProvider: Gets OAuth provider by provider and provider user ID
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -28,3 +28,4 @@ BEGIN
 	WHERE Provider = @Provider AND ProviderUserId = @ProviderUserId;
 END
 GO
+

@@ -2,7 +2,7 @@
 -- sp_GetPendingConnectionRequests: Gets pending connection requests
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -37,6 +37,7 @@ BEGIN
 	ORDER BY uc.RequestedAt DESC;
 END
 GO
+
 
 
 

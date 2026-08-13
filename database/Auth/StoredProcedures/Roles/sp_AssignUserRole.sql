@@ -2,7 +2,7 @@
 -- sp_AssignUserRole: Assigns a role to a user
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -57,6 +57,7 @@ BEGIN
 	WHERE ura.Id = @AssignmentId;
 END
 GO
+
 
 
 

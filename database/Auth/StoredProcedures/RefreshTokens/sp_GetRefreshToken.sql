@@ -2,7 +2,7 @@
 -- sp_GetRefreshToken: Gets refresh token by token value
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -27,3 +27,4 @@ BEGIN
 	WHERE Token = @Token;
 END
 GO
+

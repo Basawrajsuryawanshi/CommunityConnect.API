@@ -2,7 +2,7 @@
 -- sp_RevokeRefreshToken: Revokes a refresh token
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -31,3 +31,4 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+

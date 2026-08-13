@@ -1,7 +1,7 @@
 -- ============================================
 -- OAUTH PROVIDERS TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'OAuthProviders')
@@ -34,3 +34,4 @@ BEGIN
 	PRINT 'OAuthProviders table already exists.';
 END
 GO
+

@@ -1,7 +1,7 @@
 -- ============================================
 -- USER ROLE ASSIGNMENTS TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserRoleAssignments')
@@ -30,3 +30,4 @@ BEGIN
 	PRINT 'UserRoleAssignments table already exists.';
 END
 GO
+

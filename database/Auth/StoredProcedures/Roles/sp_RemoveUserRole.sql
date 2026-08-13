@@ -2,7 +2,7 @@
 -- sp_RemoveUserRole: Removes a role from a user
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -26,6 +26,7 @@ BEGIN
 	SELECT CAST(@@ROWCOUNT AS BIT) AS Success;
 END
 GO
+
 
 
 

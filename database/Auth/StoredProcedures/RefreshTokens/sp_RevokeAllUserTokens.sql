@@ -2,7 +2,7 @@
 -- sp_RevokeAllUserTokens: Revokes all refresh tokens for a user
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -27,4 +27,5 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+
 

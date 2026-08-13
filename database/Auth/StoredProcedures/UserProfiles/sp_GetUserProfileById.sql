@@ -2,7 +2,7 @@
 -- sp_GetUserProfileById: Gets a user profile by ID
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -28,5 +28,6 @@ BEGIN
 	WHERE Id = @Id;
 END
 GO
+
 
 

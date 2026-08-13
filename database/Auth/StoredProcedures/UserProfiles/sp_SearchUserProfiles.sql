@@ -2,7 +2,7 @@
 -- sp_SearchUserProfiles: Searches user profiles
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -47,5 +47,6 @@ BEGIN
 	FETCH NEXT @Limit ROWS ONLY;
 END
 GO
+
 
 

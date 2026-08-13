@@ -2,7 +2,7 @@
 -- sp_CreateConnectionRequest: Creates a connection request
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -43,6 +43,7 @@ BEGIN
 	WHERE Id = SCOPE_IDENTITY();
 END
 GO
+
 
 
 
