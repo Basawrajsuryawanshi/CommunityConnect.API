@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\CommunityConnect.Contracts\CommunityConnect.Contracts.csproj" />
+    <ProjectReference Include="..\..\Shared\CommunityConnect.Contracts\CommunityConnect.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
-using CommunityConnect.Auth.Core.Services;
+using CommunityConnect.Core.Services;
 using CommunityConnect.Contracts.Auth;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CommunityConnect.Auth.API.Controllers
+namespace CommunityConnect.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

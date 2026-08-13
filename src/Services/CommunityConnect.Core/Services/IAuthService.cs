@@ -1,6 +1,6 @@
 using CommunityConnect.Contracts.Auth;
 
-namespace CommunityConnect.Auth.Core.Services
+namespace CommunityConnect.Core.Services
 {
     public interface IAuthService
     {

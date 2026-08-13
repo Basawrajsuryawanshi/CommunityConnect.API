@@ -1,4 +1,4 @@
-namespace CommunityConnect.Auth.API.DTOs
+namespace CommunityConnect.API.DTOs
 {
     /// <summary>
     /// Response DTO for user profile data

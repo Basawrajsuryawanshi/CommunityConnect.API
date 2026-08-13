@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CommunityConnect.Auth.API.DTOs
+namespace CommunityConnect.API.DTOs
 {
     /// <summary>
     /// Request DTO for updating an existing user profile

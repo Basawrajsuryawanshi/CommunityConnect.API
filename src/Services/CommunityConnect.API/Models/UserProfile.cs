@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CommunityConnect.Auth.API.Models
+namespace CommunityConnect.API.Models
 {
     /// <summary>
     /// User profile domain model

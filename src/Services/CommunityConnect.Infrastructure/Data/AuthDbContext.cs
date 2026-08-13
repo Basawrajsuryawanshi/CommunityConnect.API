@@ -1,7 +1,7 @@
-using CommunityConnect.Auth.Core.Entities;
+using CommunityConnect.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace CommunityConnect.Auth.Infrastructure.Data
+namespace CommunityConnect.Infrastructure.Data
 {
     public class AuthDbContext : DbContext
     {

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using CommunityConnect.Auth.API.DTOs;
-using CommunityConnect.Auth.API.Models;
+using CommunityConnect.API.DTOs;
+using CommunityConnect.API.Models;
 
-namespace CommunityConnect.Auth.API.Controllers
+namespace CommunityConnect.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
