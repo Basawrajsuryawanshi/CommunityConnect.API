@@ -1,6 +1,6 @@
 using System;
 
-namespace CommunityConnect.Auth.Core.Entities
+namespace CommunityConnect.Core.Entities
 {
     public class User
     {

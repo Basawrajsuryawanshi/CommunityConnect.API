@@ -1,4 +1,4 @@
-namespace CommunityConnect.Auth.Core.Entities
+namespace CommunityConnect.Core.Entities
 {
     /// <summary>
     /// User profile entity

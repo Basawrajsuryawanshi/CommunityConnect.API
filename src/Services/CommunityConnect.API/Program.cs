@@ -1,7 +1,7 @@
-using CommunityConnect.Auth.Core.Data;
-using CommunityConnect.Auth.Core.Services;
-using CommunityConnect.Auth.Infrastructure.Data;
-using CommunityConnect.Auth.Infrastructure.Services;
+using CommunityConnect.Core.Data;
+using CommunityConnect.Core.Services;
+using CommunityConnect.Infrastructure.Data;
+using CommunityConnect.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,6 +1,6 @@
-using CommunityConnect.Auth.Core.Entities;
+using CommunityConnect.Core.Entities;
 
-namespace CommunityConnect.Auth.Core.Data
+namespace CommunityConnect.Core.Data
 {
     /// <summary>
     /// Interface for Auth database operations using stored procedures

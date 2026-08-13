@@ -2,14 +2,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using CommunityConnect.Auth.Core.Data;
-using CommunityConnect.Auth.Core.Entities;
-using CommunityConnect.Auth.Core.Services;
+using CommunityConnect.Core.Data;
+using CommunityConnect.Core.Entities;
+using CommunityConnect.Core.Services;
 using CommunityConnect.Contracts.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CommunityConnect.Auth.Infrastructure.Services
+namespace CommunityConnect.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {

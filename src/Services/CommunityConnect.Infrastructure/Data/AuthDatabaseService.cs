@@ -1,10 +1,10 @@
-using CommunityConnect.Auth.Core.Data;
-using CommunityConnect.Auth.Core.Entities;
+using CommunityConnect.Core.Data;
+using CommunityConnect.Core.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace CommunityConnect.Auth.Infrastructure.Data
+namespace CommunityConnect.Infrastructure.Data
 {
     /// <summary>
     /// Implementation of IAuthDatabase using ADO.NET and stored procedures
