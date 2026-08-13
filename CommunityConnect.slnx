@@ -9,11 +9,6 @@
     <Project Path="src/Services/Auth/CommunityConnect.Auth.Core/CommunityConnect.Auth.Core.csproj" />
     <Project Path="src/Services/Auth/CommunityConnect.Auth.Infrastructure/CommunityConnect.Auth.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/src/Services/Event/">
-    <Project Path="src/Services/Event/CommunityConnect.Event.API/CommunityConnect.Event.API.csproj" />
-    <Project Path="src/Services/Event/CommunityConnect.Event.Core/CommunityConnect.Event.Core.csproj" />
-    <Project Path="src/Services/Event/CommunityConnect.Event.Infrastructure/CommunityConnect.Event.Infrastructure.csproj" />
-  </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/CommunityConnect.Common/CommunityConnect.Common.csproj" />
     <Project Path="src/Shared/CommunityConnect.Contracts/CommunityConnect.Contracts.csproj" />
