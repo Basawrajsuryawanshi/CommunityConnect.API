@@ -2,7 +2,7 @@
 -- sp_GetAllRoles: Gets all available roles
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -24,5 +24,6 @@ BEGIN
 	ORDER BY Name;
 END
 GO
+
 
 

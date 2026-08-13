@@ -1,7 +1,7 @@
 -- ============================================
 -- USER CONNECTIONS TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserConnections')
@@ -32,3 +32,4 @@ BEGIN
 	PRINT 'UserConnections table already exists.';
 END
 GO
+

@@ -2,7 +2,7 @@
 -- sp_UpdateUserProfile: Updates a user profile
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -58,6 +58,7 @@ BEGIN
 	WHERE Id = @Id;
 END
 GO
+
 
 
 

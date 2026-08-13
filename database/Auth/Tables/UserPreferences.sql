@@ -1,7 +1,7 @@
 -- ============================================
 -- USER PREFERENCES TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'UserPreferences')
@@ -31,3 +31,4 @@ BEGIN
 	PRINT 'UserPreferences table already exists.';
 END
 GO
+

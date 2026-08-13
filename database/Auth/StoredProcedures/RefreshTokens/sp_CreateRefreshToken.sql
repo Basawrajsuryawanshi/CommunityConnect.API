@@ -2,7 +2,7 @@
 -- sp_CreateRefreshToken: Creates a new refresh token
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -43,4 +43,5 @@ BEGIN
 	WHERE Id = @TokenId;
 END
 GO
+
 

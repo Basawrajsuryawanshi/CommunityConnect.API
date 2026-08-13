@@ -2,7 +2,7 @@
 -- sp_CreateUser: Creates a new user
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -60,4 +60,5 @@ BEGIN
 	WHERE Id = @UserId;
 END
 GO
+
 

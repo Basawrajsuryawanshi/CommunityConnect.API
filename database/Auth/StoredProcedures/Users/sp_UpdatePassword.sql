@@ -2,7 +2,7 @@
 -- sp_UpdatePassword: Updates user password
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -30,4 +30,5 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+
 

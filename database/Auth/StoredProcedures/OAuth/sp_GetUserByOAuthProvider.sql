@@ -2,7 +2,7 @@
 -- sp_GetUserByOAuthProvider: Gets user by OAuth provider
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -32,3 +32,4 @@ BEGIN
 		AND u.IsDeleted = 0;
 END
 GO
+

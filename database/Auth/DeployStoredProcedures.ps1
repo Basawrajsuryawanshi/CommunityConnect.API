@@ -18,7 +18,7 @@ param(
 	[string]$ServerInstance = "localhost",
 
 	[Parameter(Mandatory=$false)]
-	[string]$Database = "AuthDB",
+	[string]$Database = "Communityconnect",
 
 	[Parameter(Mandatory=$false)]
 	[switch]$UseTrustedConnection = $true

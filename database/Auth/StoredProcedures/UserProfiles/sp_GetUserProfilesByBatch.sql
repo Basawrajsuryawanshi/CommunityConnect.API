@@ -2,7 +2,7 @@
 -- sp_GetUserProfilesByPassoutYear: Gets user profiles by passout year
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -38,5 +38,6 @@ BEGIN
 	FETCH NEXT @Limit ROWS ONLY;
 END
 GO
+
 
 

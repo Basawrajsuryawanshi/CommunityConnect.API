@@ -2,7 +2,7 @@
 -- sp_GetUserProfilesBySchool: Gets user profiles by school name
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -40,5 +40,6 @@ BEGIN
 	FETCH NEXT @Limit ROWS ONLY;
 END
 GO
+
 
 

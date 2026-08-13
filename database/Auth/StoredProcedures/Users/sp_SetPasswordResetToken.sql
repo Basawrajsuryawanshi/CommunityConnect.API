@@ -2,7 +2,7 @@
 -- sp_SetPasswordResetToken: Sets password reset token
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -30,4 +30,5 @@ BEGIN
 	RETURN @@ROWCOUNT;
 END
 GO
+
 

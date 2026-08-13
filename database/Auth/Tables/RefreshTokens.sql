@@ -1,7 +1,7 @@
 -- ============================================
 -- REFRESH TOKENS TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'RefreshTokens')
@@ -32,3 +32,4 @@ BEGIN
 	PRINT 'RefreshTokens table already exists.';
 END
 GO
+

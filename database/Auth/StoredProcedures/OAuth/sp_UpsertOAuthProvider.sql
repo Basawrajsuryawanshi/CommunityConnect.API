@@ -2,7 +2,7 @@
 -- sp_UpsertOAuthProvider: Creates or updates OAuth provider
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -69,4 +69,5 @@ BEGIN
 	WHERE Id = @OAuthId;
 END
 GO
+
 

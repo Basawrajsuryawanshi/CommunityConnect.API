@@ -1,7 +1,7 @@
 -- ============================================
 -- USERS TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Users')
@@ -33,3 +33,4 @@ BEGIN
 	PRINT 'Users table already exists.';
 END
 GO
+

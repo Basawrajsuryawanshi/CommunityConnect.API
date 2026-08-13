@@ -2,7 +2,7 @@
 -- sp_GetUserPreferences: Gets user preferences
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -27,6 +27,7 @@ BEGIN
 	WHERE UserId = @UserId;
 END
 GO
+
 
 
 

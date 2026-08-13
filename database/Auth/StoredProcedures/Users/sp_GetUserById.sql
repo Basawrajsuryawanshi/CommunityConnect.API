@@ -2,7 +2,7 @@
 -- sp_GetUserById: Retrieves user by ID
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -28,4 +28,5 @@ BEGIN
 	WHERE Id = @UserId AND IsDeleted = 0;
 END
 GO
+
 

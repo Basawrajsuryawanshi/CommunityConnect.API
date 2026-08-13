@@ -2,7 +2,7 @@
 -- sp_UpsertUserPreferences: Creates or updates user preferences
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -75,6 +75,7 @@ BEGIN
 	WHERE Id = @PreferenceId;
 END
 GO
+
 
 
 

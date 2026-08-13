@@ -2,7 +2,7 @@
 -- sp_GetUserByEmail: Retrieves user by email
 -- ============================================
 
-USE AuthDB;
+USE Communityconnect;
 GO
 
 SET ANSI_NULLS ON;
@@ -28,3 +28,4 @@ BEGIN
 	WHERE Email = @Email AND IsDeleted = 0;
 END
 GO
+

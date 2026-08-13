@@ -9,20 +9,20 @@ USE master;
 GO
 
 -- Create database if it doesn't exist
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'AuthDB')
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'Communityconnect')
 BEGIN
-	CREATE DATABASE AuthDB;
-	PRINT 'Database AuthDB created successfully.';
+	CREATE DATABASE Communityconnect;
+	PRINT 'Database Communityconnect created successfully.';
 END
 ELSE
 BEGIN
-	PRINT 'Database AuthDB already exists.';
+	PRINT 'Database Communityconnect already exists.';
 END
 GO
 
 PRINT '============================================';
 PRINT 'Database initialization completed!';
-PRINT 'Database: AuthDB';
+PRINT 'Database: Communityconnect';
 PRINT '';
 PRINT 'Next Steps:';
 PRINT '1. Deploy tables from the Tables folder in this order:';

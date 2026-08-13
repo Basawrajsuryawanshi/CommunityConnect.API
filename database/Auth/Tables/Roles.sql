@@ -1,7 +1,7 @@
 -- ============================================
 -- ROLES TABLE
 -- ============================================
-USE AuthDB;
+USE Communityconnect;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Roles')
@@ -39,3 +39,4 @@ BEGIN
 	PRINT 'Default roles already exist.';
 END
 GO
+
