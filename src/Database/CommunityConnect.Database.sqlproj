@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>CommunityConnect.Database</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{A8B9C1D2-3E4F-5A6B-7C8D-9E0F1A2B3C4D}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>CommunityConnect.Database</RootNamespace>
+    <AssemblyName>CommunityConnect.Database</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <TargetFrameworkProfile />
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CommunityConnect.Database.publish.xml" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\Roles.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\UserProfiles.sql" />
+    <Build Include="dbo\Tables\RefreshTokens.sql" />
+    <Build Include="dbo\Tables\OAuthProviders.sql" />
+    <Build Include="dbo\Tables\UserRoleAssignments.sql" />
+    <Build Include="dbo\Tables\UserPreferences.sql" />
+    <Build Include="dbo\Tables\UserConnections.sql" />
+    <Build Include="dbo\Tables\LoginAttempts.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RejectConnectionRequest.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserProfilesByPassoutYear.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserByOAuthProvider.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateLastLogin.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserPreferences.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserProfilesBySchool.sql" />
+    <Build Include="dbo\Stored Procedures\sp_SearchUserProfiles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateUserProfile.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpsertOAuthProvider.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdatePassword.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpsertUserPreferences.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CreateUser.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CreateRefreshToken.sql" />
+    <Build Include="dbo\Stored Procedures\sp_VerifyEmail.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RemoveUserRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CreateUserProfile.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteUser.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetRefreshToken.sql" />
+    <Build Include="dbo\Stored Procedures\sp_AcceptConnectionRequest.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteUserProfile.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserByEmail.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RevokeAllUserTokens.sql" />
+    <Build Include="dbo\Stored Procedures\sp_BlockUserConnection.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetAllUserProfiles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_RevokeRefreshToken.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CreateConnectionRequest.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetUserProfileById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetOAuthProvider.sql" />
+    <Build Include="dbo\Stored Procedures\sp_SetPasswordResetToken.sql" />
+    <Build Include="dbo\Stored Procedures\sp_AssignUserRole.sql" />
+  </ItemGroup>
+</Project>

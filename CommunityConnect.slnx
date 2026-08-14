@@ -1,16 +1,22 @@
 <Solution>
   <Folder Name="/src/" />
+  <Folder Name="/src/Database/">
+    <Project Path="src/Database/CommunityConnect.Database.sqlproj" Id="a8b9c1d2-3e4f-5a6b-7c8d-9e0f1a2b3c4d">
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
   <Folder Name="/src/Gateway/">
-	<Project Path="src/Gateway/CommunityConnect.Gateway/CommunityConnect.Gateway.csproj" />
+    <Project Path="src/Gateway/CommunityConnect.Gateway/CommunityConnect.Gateway.csproj" />
   </Folder>
   <Folder Name="/src/Services/">
-	<Project Path="src/Services/CommunityConnect.API/CommunityConnect.API.csproj" />
-	<Project Path="src/Services/CommunityConnect.Core/CommunityConnect.Core.csproj" />
-	<Project Path="src/Services/CommunityConnect.Infrastructure/CommunityConnect.Infrastructure.csproj" />
+    <Project Path="src/Services/CommunityConnect.API/CommunityConnect.API.csproj" />
+    <Project Path="src/Services/CommunityConnect.Core/CommunityConnect.Core.csproj" />
+    <Project Path="src/Services/CommunityConnect.Infrastructure/CommunityConnect.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
-	<Project Path="src/Shared/CommunityConnect.Common/CommunityConnect.Common.csproj" />
-	<Project Path="src/Shared/CommunityConnect.Contracts/CommunityConnect.Contracts.csproj" />
-	<Project Path="src/Shared/CommunityConnect.MessageBus/CommunityConnect.MessageBus.csproj" />
+    <Project Path="src/Shared/CommunityConnect.Common/CommunityConnect.Common.csproj" />
+    <Project Path="src/Shared/CommunityConnect.Contracts/CommunityConnect.Contracts.csproj" />
+    <Project Path="src/Shared/CommunityConnect.MessageBus/CommunityConnect.MessageBus.csproj" />
   </Folder>
 </Solution>

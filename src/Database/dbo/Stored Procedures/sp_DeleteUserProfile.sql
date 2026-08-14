@@ -1,0 +1,12 @@
+﻿
+CREATE PROCEDURE sp_DeleteUserProfile
+	@Id INT
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	DELETE FROM UserProfiles
+	WHERE Id = @Id;
+
+	SELECT CAST(@@ROWCOUNT AS BIT) AS Success;
+END
