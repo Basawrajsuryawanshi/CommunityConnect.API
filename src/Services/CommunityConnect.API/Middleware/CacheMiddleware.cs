@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace CommunityConnect.Gateway.Middleware;
+namespace CommunityConnect.API.Middleware;
 
 /// <summary>
 /// Middleware for caching GET requests with intelligent TTL based on resource type

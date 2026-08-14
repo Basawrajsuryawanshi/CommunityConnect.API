@@ -1,6 +1,6 @@
 using StackExchange.Redis;
 
-namespace CommunityConnect.Gateway.Services;
+namespace CommunityConnect.API.Services;
 
 /// <summary>
 /// Redis implementation of cache service with TTL support

@@ -1,7 +1,7 @@
-namespace CommunityConnect.Gateway.Services;
+namespace CommunityConnect.API.Services;
 
 /// <summary>
-/// Defines caching operations for the API Gateway
+/// Defines caching operations for the API
 /// </summary>
 public interface ICacheService
 {
