@@ -105,7 +105,6 @@ namespace CommunityConnect.Infrastructure.Data
 
             command.Parameters.AddRange(parameters);
 
-            await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
@@ -466,6 +465,75 @@ namespace CommunityConnect.Infrastructure.Data
             var userProfile = await ExecuteReaderSingleAsync("sp_CreateUserProfile", MapUserProfile, parameters);
 
             return userProfile ?? throw new InvalidOperationException("Failed to create user profile");
+        }
+
+        public async Task<UserProfile?> GetUserProfileByIdAsync(int id)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@Id", id)
+            };
+
+            return await ExecuteReaderSingleAsync("sp_GetUserProfileById", MapUserProfile, parameters);
+        }
+
+        public async Task<(List<UserProfile> Profiles, int TotalCount)> GetAllUserProfilesAsync(int pageNumber = 1, int pageSize = 50)
+        {
+            var profiles = new List<UserProfile>();
+            int totalCount = 0;
+
+            using var connection = GetConnection();
+            await connection.OpenAsync();
+            await SetConnectionOptionsAsync(connection);
+
+            using var command = new SqlCommand("sp_GetAllUserProfiles", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            command.Parameters.Add(new SqlParameter("@PageNumber", pageNumber));
+            command.Parameters.Add(new SqlParameter("@PageSize", pageSize));
+
+            using var reader = await command.ExecuteReaderAsync();
+
+            // First result set: User profiles
+            while (await reader.ReadAsync())
+            {
+                profiles.Add(MapUserProfile(reader));
+            }
+
+            // Second result set: Total count
+            if (await reader.NextResultAsync())
+            {
+                if (await reader.ReadAsync())
+                {
+                    totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                }
+            }
+
+            return (profiles, totalCount);
+        }
+
+        // ============================================
+        // ROLE OPERATIONS
+        // ============================================
+
+        private Role MapRole(SqlDataReader reader)
+        {
+            return new Role
+            {
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                Name = reader.GetString(reader.GetOrdinal("Name")),
+                Description = reader.IsDBNull(reader.GetOrdinal("Description")) 
+                    ? string.Empty 
+                    : reader.GetString(reader.GetOrdinal("Description")),
+                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+            };
+        }
+
+        public async Task<List<Role>> GetAllRolesAsync()
+        {
+            return await ExecuteReaderListAsync("sp_GetAllRoles", MapRole);
         }
     }
 }

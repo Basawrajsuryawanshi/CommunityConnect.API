@@ -142,5 +142,28 @@ namespace CommunityConnect.Core.Data
             string currentState,
             string currentDistrict,
             string bloodGroup);
+
+        /// <summary>
+        /// Gets user profile by ID using sp_GetUserProfileById stored procedure
+        /// </summary>
+        Task<UserProfile?> GetUserProfileByIdAsync(int id);
+
+        /// <summary>
+        /// Gets all user profiles with pagination using sp_GetAllUserProfiles stored procedure
+        /// </summary>
+        /// <param name="pageNumber">Page number (1-based)</param>
+        /// <param name="pageSize">Number of records per page</param>
+        /// <returns>Tuple containing list of user profiles and total count</returns>
+        Task<(List<UserProfile> Profiles, int TotalCount)> GetAllUserProfilesAsync(int pageNumber = 1, int pageSize = 50);
+
+        // ============================================
+        // ROLE OPERATIONS
+        // ============================================
+
+        /// <summary>
+        /// Gets all roles using sp_GetAllRoles stored procedure
+        /// </summary>
+        /// <returns>List of all roles</returns>
+        Task<List<Role>> GetAllRolesAsync();
     }
 }

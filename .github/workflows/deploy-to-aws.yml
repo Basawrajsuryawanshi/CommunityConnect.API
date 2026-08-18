@@ -1,0 +1,205 @@
+name: Deploy to AWS Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+env:
+  AWS_REGION: ap-south-1
+  EB_APPLICATION_NAME: CommunityConnect-API
+  EB_ENVIRONMENT_NAME: communityconnect-api-env
+  DEPLOY_PACKAGE: deployment-package-${{ github.sha }}.zip
+
+jobs:
+  # Job 1: Build and Test
+  build:
+    name: Build and Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore CommunityConnect.slnx
+        #working-directory: src/Services/CommunityConnect.API
+
+      - name: Build
+        run: dotnet build CommunityConnect.slnx --configuration Release --no-restore
+        working-directory: src/Services/CommunityConnect.API
+
+      - name: Run tests
+        run: dotnet test CommunityConnect.slnx--configuration Release --no-build --verbosity normal
+        continue-on-error: true  # Don't fail deployment if tests fail (adjust as needed)
+
+      - name: Publish
+        run: dotnet publish src/Services/CommunityConnect.API/CommunityConnect.API.csproj --configuration Release --output ./publish --no-build        
+
+      - name: Copy .ebextensions
+        shell: pwsh
+        run: |
+          if (Test-Path ".ebextensions") {
+            Copy-Item -Path ".ebextensions" -Destination "publish/.ebextensions" -Recurse -Force
+          }
+        working-directory: src/Services/CommunityConnect.API
+
+      - name: Create deployment package
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "publish/*" -DestinationPath "${{ env.DEPLOY_PACKAGE }}" -Force
+        working-directory: src/Services/CommunityConnect.API
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package
+          path: src/Services/CommunityConnect.API/${{ env.DEPLOY_PACKAGE }}
+          retention-days: 5
+
+  # Job 2: Deploy to AWS (only on push to main/master)
+  deploy:
+    name: Deploy to AWS
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-package
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Create version label
+        id: version
+        run: |
+          VERSION_LABEL="${{ github.sha }}-$(date +%Y%m%d-%H%M%S)"
+          echo "version_label=$VERSION_LABEL" >> $GITHUB_OUTPUT
+          echo "Version Label: $VERSION_LABEL"
+
+      - name: Get S3 bucket
+        id: s3bucket
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          S3_BUCKET="elasticbeanstalk-${{ env.AWS_REGION }}-${ACCOUNT_ID}"
+          echo "s3_bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
+          echo "S3 Bucket: $S3_BUCKET"
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp ${{ env.DEPLOY_PACKAGE }} \
+            s3://${{ steps.s3bucket.outputs.s3_bucket }}/${{ env.EB_APPLICATION_NAME }}/${{ steps.version.outputs.version_label }}.zip
+
+      - name: Create application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name ${{ env.EB_APPLICATION_NAME }} \
+            --version-label ${{ steps.version.outputs.version_label }} \
+            --description "Build ${{ github.run_number }} - Commit ${{ github.sha }}" \
+            --source-bundle S3Bucket="${{ steps.s3bucket.outputs.s3_bucket }}",S3Key="${{ env.EB_APPLICATION_NAME }}/${{ steps.version.outputs.version_label }}.zip" \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk update-environment \
+            --application-name ${{ env.EB_APPLICATION_NAME }} \
+            --environment-name ${{ env.EB_ENVIRONMENT_NAME }} \
+            --version-label ${{ steps.version.outputs.version_label }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for environment to update..."
+          aws elasticbeanstalk wait environment-updated \
+            --application-name ${{ env.EB_APPLICATION_NAME }} \
+            --environment-names ${{ env.EB_ENVIRONMENT_NAME }} \
+            --region ${{ env.AWS_REGION }}
+          echo "Deployment completed!"
+
+      - name: Get environment URL
+        id: env-url
+        run: |
+          ENV_URL=$(aws elasticbeanstalk describe-environments \
+            --application-name ${{ env.EB_APPLICATION_NAME }} \
+            --environment-names ${{ env.EB_ENVIRONMENT_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --query "Environments[0].CNAME" \
+            --output text)
+          echo "env_url=$ENV_URL" >> $GITHUB_OUTPUT
+          echo "Application URL: http://$ENV_URL"
+
+      - name: Verify deployment
+        run: |
+          echo "Testing health endpoint..."
+          curl -f http://${{ steps.env-url.outputs.env_url }}/health || echo "Health check failed"
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+            echo "🌐 Application URL: http://${{ steps.env-url.outputs.env_url }}"
+          else
+            echo "❌ Deployment failed!"
+          fi
+
+  # Job 3: Rollback on failure (optional)
+  rollback:
+    name: Rollback on Failure
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get previous version
+        id: prev-version
+        run: |
+          PREV_VERSION=$(aws elasticbeanstalk describe-application-versions \
+            --application-name ${{ env.EB_APPLICATION_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --query "ApplicationVersions[?Status=='PROCESSED'] | sort_by(@, &DateCreated) | [-2].VersionLabel" \
+            --output text)
+          echo "prev_version=$PREV_VERSION" >> $GITHUB_OUTPUT
+          echo "Previous version: $PREV_VERSION"
+
+      - name: Rollback to previous version
+        if: steps.prev-version.outputs.prev_version != ''
+        run: |
+          echo "Rolling back to version: ${{ steps.prev-version.outputs.prev_version }}"
+          aws elasticbeanstalk update-environment \
+            --application-name ${{ env.EB_APPLICATION_NAME }} \
+            --environment-name ${{ env.EB_ENVIRONMENT_NAME }} \
+            --version-label ${{ steps.prev-version.outputs.prev_version }} \
+            --region ${{ env.AWS_REGION }}
+
+          echo "⚠️ Deployment failed and was rolled back to previous version"

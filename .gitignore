@@ -397,3 +397,24 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 .idea/
+
+# ============================================
+# AWS Elastic Beanstalk Deployment
+# ============================================
+# Elastic Beanstalk Files
+.elasticbeanstalk/
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# Deployment packages
+publish/
+*.zip
+
+# AWS credentials (NEVER commit these!)
+aws-credentials.txt
+credentials.json
+**/appsettings.Production.json
+
+# Application logs
+Logs/
+*.log

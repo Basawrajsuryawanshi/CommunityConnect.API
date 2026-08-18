@@ -184,6 +184,7 @@ try
 
     // Services
     builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
     // ============================================
     // HEALTH CHECKS
