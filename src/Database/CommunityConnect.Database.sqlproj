@@ -6,7 +6,7 @@
     <Name>CommunityConnect.Database</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{A8B9C1D2-3E4F-5A6B-7C8D-9E0F1A2B3C4D}</ProjectGuid>
+    <ProjectGuid>{a8b9c1d2-3e4f-5a6b-7c8d-9e0f1a2b3c4d}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
