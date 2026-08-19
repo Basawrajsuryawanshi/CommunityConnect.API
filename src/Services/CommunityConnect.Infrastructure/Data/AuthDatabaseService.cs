@@ -535,5 +535,65 @@ namespace CommunityConnect.Infrastructure.Data
         {
             return await ExecuteReaderListAsync("sp_GetAllRoles", MapRole);
         }
+
+        public async Task<Role?> GetRoleByIdAsync(int id)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@RoleId", id)
+            };
+
+            var roles = await ExecuteReaderListAsync("sp_GetRoleById", MapRole, parameters);
+            return roles.FirstOrDefault();
+        }
+
+        public async Task<Role> CreateRoleAsync(string name, string description)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@Name", name),
+                new SqlParameter("@Description", description)
+            };
+
+            var roles = await ExecuteReaderListAsync("sp_CreateRole", MapRole, parameters);
+            return roles.First();
+        }
+
+        public async Task<Role?> UpdateRoleAsync(int id, string name, string description)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@RoleId", id),
+                new SqlParameter("@Name", name),
+                new SqlParameter("@Description", description)
+            };
+
+            var roles = await ExecuteReaderListAsync("sp_UpdateRole", MapRole, parameters);
+            return roles.FirstOrDefault();
+        }
+
+        public async Task<bool> DeleteRoleAsync(int id)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@RoleId", id)
+            };
+
+            try
+            {
+                var result = await ExecuteNonQueryAsync("sp_DeleteRole", parameters);
+
+                // Temporary debug logging - you can remove this after debugging
+                Console.WriteLine($"[DEBUG] DeleteRoleAsync: RoleId={id}, RowsAffected={result}");
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                // Temporary debug logging
+                Console.WriteLine($"[DEBUG] DeleteRoleAsync ERROR: RoleId={id}, Exception={ex.Message}");
+                throw;
+            }
+        }
     }
 }

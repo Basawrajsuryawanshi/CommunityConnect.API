@@ -91,11 +91,5 @@ namespace CommunityConnect.Core.Services
         /// <param name="role">Optional role filter</param>
         /// <returns>Tuple containing list of user profiles and total count</returns>
         Task<(List<UserProfile> Profiles, int TotalCount)> GetAllUserProfilesAsync(int pageNumber = 1, int pageSize = 50, string? role = null);
-
-        /// <summary>
-        /// Get all roles
-        /// </summary>
-        /// <returns>List of all roles</returns>
-        Task<List<Role>> GetAllRolesAsync();
     }
 }

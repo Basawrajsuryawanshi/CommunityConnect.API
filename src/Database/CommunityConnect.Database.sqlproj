@@ -109,5 +109,9 @@
     <Build Include="dbo\Stored Procedures\sp_GetOAuthProvider.sql" />
     <Build Include="dbo\Stored Procedures\sp_SetPasswordResetToken.sql" />
     <Build Include="dbo\Stored Procedures\sp_AssignUserRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CreateRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetRoleById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateRole.sql" />
   </ItemGroup>
 </Project>

@@ -175,24 +175,5 @@ namespace CommunityConnect.Infrastructure.Services
                 throw;
             }
         }
-
-        public async Task<List<Role>> GetAllRolesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Retrieving all roles");
-
-                var roles = await _authDatabase.GetAllRolesAsync();
-
-                _logger.LogInformation("Retrieved {Count} roles", roles.Count);
-
-                return roles;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving all roles");
-                throw;
-            }
-        }
     }
 }

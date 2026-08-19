@@ -185,6 +185,7 @@ try
     // Services
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+    builder.Services.AddScoped<IRoleService, RoleService>();
 
     // ============================================
     // HEALTH CHECKS
@@ -220,13 +221,14 @@ try
         app.UseSwaggerUI();
     }
 
+    app.UseHttpsRedirection();
     // Use CORS
     app.UseCors("CommunityConnectCorsPolicy");
 
     // Use IP Rate Limiting
     app.UseIpRateLimiting();
 
-    app.UseHttpsRedirection();
+
 
     // Use Authentication & Authorization
     app.UseAuthentication();
