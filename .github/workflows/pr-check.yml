@@ -1,0 +1,90 @@
+name: PR Build and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  SQL_PROJECT: 'src/Database/CommunityConnect.Database.sqlproj'
+
+jobs:
+  build-and-test:
+    name: Build, Test and Validate SQL Project
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ==========================================
+      # .NET
+      # ==========================================
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore .NET dependencies
+        run: dotnet restore CommunityConnect.slnx
+
+      - name: Build .NET
+        run: dotnet build CommunityConnect.slnx --configuration Release --no-restore
+
+      - name: Run .NET tests
+        run: dotnet test CommunityConnect.slnx --configuration Release --no-build --verbosity normal
+
+      # ==========================================
+      # SQL DATABASE PROJECT
+      # ==========================================
+
+      - name: Build SQL Database Project
+        run: dotnet build "${{ env.SQL_PROJECT }}" --configuration Release
+
+      - name: Verify DACPAC
+        shell: pwsh
+        run: |
+          $dacpac = Get-ChildItem `
+            -Path . `
+            -Filter "CommunityConnect.Database.dacpac" `
+            -Recurse |
+            Select-Object -First 1
+
+          if ($null -eq $dacpac) {
+              Write-Error "CommunityConnect.Database.dacpac was not generated."
+              exit 1
+          }
+
+          Write-Host "DACPAC successfully generated:"
+          Write-Host $dacpac.FullName
+
+      # ==========================================
+      # PR RESULT
+      # ==========================================
+
+      - name: Comment on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+
+            const emoji = status === 'success' ? '✅' : '❌';
+
+            const message = status === 'success'
+              ? 'Build, tests and SQL Database Project validation passed!'
+              : 'Build, tests or SQL Database Project validation failed. Please check the workflow logs.';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${emoji} ${message}\n\nCommit: ${context.sha}`
+            });

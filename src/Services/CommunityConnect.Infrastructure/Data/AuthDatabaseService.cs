@@ -105,7 +105,6 @@ namespace CommunityConnect.Infrastructure.Data
 
             command.Parameters.AddRange(parameters);
 
-            await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
@@ -466,6 +465,135 @@ namespace CommunityConnect.Infrastructure.Data
             var userProfile = await ExecuteReaderSingleAsync("sp_CreateUserProfile", MapUserProfile, parameters);
 
             return userProfile ?? throw new InvalidOperationException("Failed to create user profile");
+        }
+
+        public async Task<UserProfile?> GetUserProfileByIdAsync(int id)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@Id", id)
+            };
+
+            return await ExecuteReaderSingleAsync("sp_GetUserProfileById", MapUserProfile, parameters);
+        }
+
+        public async Task<(List<UserProfile> Profiles, int TotalCount)> GetAllUserProfilesAsync(int pageNumber = 1, int pageSize = 50)
+        {
+            var profiles = new List<UserProfile>();
+            int totalCount = 0;
+
+            using var connection = GetConnection();
+            await connection.OpenAsync();
+            await SetConnectionOptionsAsync(connection);
+
+            using var command = new SqlCommand("sp_GetAllUserProfiles", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            command.Parameters.Add(new SqlParameter("@PageNumber", pageNumber));
+            command.Parameters.Add(new SqlParameter("@PageSize", pageSize));
+
+            using var reader = await command.ExecuteReaderAsync();
+
+            // First result set: User profiles
+            while (await reader.ReadAsync())
+            {
+                profiles.Add(MapUserProfile(reader));
+            }
+
+            // Second result set: Total count
+            if (await reader.NextResultAsync())
+            {
+                if (await reader.ReadAsync())
+                {
+                    totalCount = reader.GetInt32(reader.GetOrdinal("TotalCount"));
+                }
+            }
+
+            return (profiles, totalCount);
+        }
+
+        // ============================================
+        // ROLE OPERATIONS
+        // ============================================
+
+        private Role MapRole(SqlDataReader reader)
+        {
+            return new Role
+            {
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                Name = reader.GetString(reader.GetOrdinal("Name")),
+                Description = reader.IsDBNull(reader.GetOrdinal("Description")) 
+                    ? string.Empty 
+                    : reader.GetString(reader.GetOrdinal("Description")),
+                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+            };
+        }
+
+        public async Task<List<Role>> GetAllRolesAsync()
+        {
+            return await ExecuteReaderListAsync("sp_GetAllRoles", MapRole);
+        }
+
+        public async Task<Role?> GetRoleByIdAsync(int id)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@RoleId", id)
+            };
+
+            var roles = await ExecuteReaderListAsync("sp_GetRoleById", MapRole, parameters);
+            return roles.FirstOrDefault();
+        }
+
+        public async Task<Role> CreateRoleAsync(string name, string description)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@Name", name),
+                new SqlParameter("@Description", description)
+            };
+
+            var roles = await ExecuteReaderListAsync("sp_CreateRole", MapRole, parameters);
+            return roles.First();
+        }
+
+        public async Task<Role?> UpdateRoleAsync(int id, string name, string description)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@RoleId", id),
+                new SqlParameter("@Name", name),
+                new SqlParameter("@Description", description)
+            };
+
+            var roles = await ExecuteReaderListAsync("sp_UpdateRole", MapRole, parameters);
+            return roles.FirstOrDefault();
+        }
+
+        public async Task<bool> DeleteRoleAsync(int id)
+        {
+            var parameters = new[]
+            {
+                new SqlParameter("@RoleId", id)
+            };
+
+            try
+            {
+                var result = await ExecuteNonQueryAsync("sp_DeleteRole", parameters);
+
+                // Temporary debug logging - you can remove this after debugging
+                Console.WriteLine($"[DEBUG] DeleteRoleAsync: RoleId={id}, RowsAffected={result}");
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                // Temporary debug logging
+                Console.WriteLine($"[DEBUG] DeleteRoleAsync ERROR: RoleId={id}, Exception={ex.Message}");
+                throw;
+            }
         }
     }
 }

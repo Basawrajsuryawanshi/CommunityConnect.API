@@ -1,0 +1,321 @@
+# GitHub Actions CI/CD Pipeline - Visual Guide
+
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                    GITHUB ACTIONS CI/CD PIPELINE                           ║
+║                    CommunityConnect.API → AWS Elastic Beanstalk            ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ TRIGGER: Pull Request Created/Updated                                     │
+└────────────────────────────────┬───────────────────────────────────────────┘
+								 │
+								 ▼
+		┌─────────────────────────────────────────────────┐
+		│        GitHub Actions: PR Check Workflow        │
+		│        (pr-check.yml)                           │
+		├─────────────────────────────────────────────────┤
+		│ Step 1: Checkout Code                           │
+		│ Step 2: Setup .NET 10                           │
+		│ Step 3: Restore Dependencies                    │
+		│ Step 4: Build (Release)                         │
+		│ Step 5: Run Tests                               │
+		│ Step 6: Comment on PR                           │
+		└─────────────────┬───────────────────────────────┘
+						  │
+						  ▼
+		┌─────────────────────────────────────────────────┐
+		│ ✅ Build Success - PR can be merged             │
+		│ ❌ Build Failed - Fix issues before merge       │
+		└─────────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ TRIGGER: Merge to Main/Master Branch                                      │
+└────────────────────────────────┬───────────────────────────────────────────┘
+								 │
+								 ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                       JOB 1: BUILD & TEST                                  │
+│                       Runs on: windows-latest                              │
+│                       Time: 2-3 minutes                                    │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  Step 1: Checkout Code                                                    │
+│  └─> uses: actions/checkout@v4                                            │
+│                                                                            │
+│  Step 2: Setup .NET 10                                                    │
+│  └─> uses: actions/setup-dotnet@v4                                        │
+│  └─> dotnet-version: '10.0.x'                                             │
+│                                                                            │
+│  Step 3: Restore Dependencies                                             │
+│  └─> dotnet restore                                                       │
+│                                                                            │
+│  Step 4: Build Application                                                │
+│  └─> dotnet build --configuration Release                                 │
+│                                                                            │
+│  Step 5: Run Tests                                                        │
+│  └─> dotnet test --configuration Release                                  │
+│                                                                            │
+│  Step 6: Publish Application                                              │
+│  └─> dotnet publish --configuration Release --output ./publish            │
+│                                                                            │
+│  Step 7: Copy .ebextensions                                               │
+│  └─> Copy-Item .ebextensions to publish/.ebextensions                     │
+│                                                                            │
+│  Step 8: Create Deployment Package                                        │
+│  └─> Compress-Archive publish/* → deployment-package.zip                  │
+│                                                                            │
+│  Step 9: Upload Artifact                                                  │
+│  └─> uses: actions/upload-artifact@v4                                     │
+│                                                                            │
+└────────────────────────────────┬───────────────────────────────────────────┘
+								 │
+								 ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         JOB 2: DEPLOY TO AWS                               │
+│                         Runs on: ubuntu-latest                             │
+│                         Time: 4-6 minutes                                  │
+│                         Depends on: build job                              │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  Step 1: Download Build Artifact                                          │
+│  └─> uses: actions/download-artifact@v4                                   │
+│                                                                            │
+│  Step 2: Configure AWS Credentials                                        │
+│  └─> uses: aws-actions/configure-aws-credentials@v4                       │
+│  └─> AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}                  │
+│  └─> AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}          │
+│                                                                            │
+│  Step 3: Create Version Label                                             │
+│  └─> VERSION_LABEL = commit-sha + timestamp                               │
+│  └─> Example: abc123-20240814-153045                                      │
+│                                                                            │
+│  Step 4: Get S3 Bucket Name                                               │
+│  └─> BUCKET = elasticbeanstalk-ap-south-1-[account-id]                    │
+│                                                                            │
+│  Step 5: Upload Package to S3                                             │
+│  └─> aws s3 cp deployment-package.zip s3://[bucket]/[app]/[version].zip   │
+│                                                                            │
+│  Step 6: Create Application Version                                       │
+│  └─> aws elasticbeanstalk create-application-version                      │
+│  └─> --application-name CommunityConnect-API                              │
+│  └─> --version-label [version]                                            │
+│  └─> --source-bundle S3Bucket=[bucket],S3Key=[key]                        │
+│                                                                            │
+│  Step 7: Deploy to Environment                                            │
+│  └─> aws elasticbeanstalk update-environment                              │
+│  └─> --application-name CommunityConnect-API                              │
+│  └─> --environment-name communityconnect-api-env                          │
+│  └─> --version-label [version]                                            │
+│                                                                            │
+│  Step 8: Wait for Deployment                                              │
+│  └─> aws elasticbeanstalk wait environment-updated                        │
+│  └─> This waits until deployment completes                                │
+│                                                                            │
+│  Step 9: Get Environment URL                                              │
+│  └─> ENV_URL = [env-name].[region].elasticbeanstalk.com                   │
+│                                                                            │
+│  Step 10: Verify Deployment                                               │
+│  └─> curl http://[ENV_URL]/health                                         │
+│  └─> Check if health endpoint responds                                    │
+│                                                                            │
+│  Step 11: Notify Status                                                   │
+│  └─> ✅ Deployment successful!                                            │
+│  └─> 🌐 Application URL: http://[ENV_URL]                                 │
+│                                                                            │
+└────────────────────────────────┬───────────────────────────────────────────┘
+								 │
+								 │ if SUCCESS
+								 ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                    ✅ DEPLOYMENT SUCCESSFUL                                │
+│                                                                            │
+│  Your API is now live at:                                                 │
+│  http://communityconnect-api-env.[id].elasticbeanstalk.com                │
+│                                                                            │
+│  Endpoints:                                                                │
+│  • /health         - Health check                                         │
+│  • /swagger        - API documentation                                    │
+│  • /api/...        - Your API endpoints                                   │
+└────────────────────────────────────────────────────────────────────────────┘
+
+								 │ if FAILURE
+								 ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                      JOB 3: ROLLBACK (Optional)                            │
+│                      Runs on: ubuntu-latest                                │
+│                      Condition: if deploy job fails                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  Step 1: Get Previous Version                                             │
+│  └─> Query previous successful deployment version                         │
+│                                                                            │
+│  Step 2: Rollback to Previous Version                                     │
+│  └─> aws elasticbeanstalk update-environment                              │
+│  └─> --version-label [previous-version]                                   │
+│                                                                            │
+│  Step 3: Notify Rollback                                                  │
+│  └─> ⚠️ Deployment failed, rolled back to previous version                │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+						 AWS DEPLOYMENT FLOW
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         GitHub Actions Runner                              │
+│                                                                            │
+│  ┌──────────────────────────────────────────────────────────────────┐     │
+│  │ Deployment Package (ZIP)                                         │     │
+│  │ • CommunityConnect.API.dll                                       │     │
+│  │ • appsettings.Production.json                                    │     │
+│  │ • .ebextensions/                                                 │     │
+│  │ • All dependencies                                               │     │
+│  └────────────────────────┬─────────────────────────────────────────┘     │
+└────────────────────────────┼──────────────────────────────────────────────┘
+							 │
+							 │ Upload via AWS CLI
+							 ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         AWS S3 Bucket                                      │
+│                elasticbeanstalk-ap-south-1-[account]                       │
+│                                                                            │
+│  └─ CommunityConnect-API/                                                 │
+│     └─ version-20240814-153045.zip                                        │
+└────────────────────────────┬───────────────────────────────────────────────┘
+							 │
+							 │ EB retrieves package
+							 ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                    AWS Elastic Beanstalk                                   │
+│                    Application: CommunityConnect-API                       │
+│                    Environment: communityconnect-api-env                   │
+│                                                                            │
+│  Action: Create new application version                                   │
+│  Action: Deploy to environment                                            │
+│  Action: Update EC2 instances                                             │
+└────────────────────────────┬───────────────────────────────────────────────┘
+							 │
+							 │ Distribute to instances
+							 ▼
+┌──────────────────────┐   ┌──────────────────────┐   ┌──────────────────────┐
+│   EC2 Instance 1     │   │   EC2 Instance 2     │   │   EC2 Instance 3-4   │
+│   Windows 2022       │   │   Windows 2022       │   │   Windows 2022       │
+│                      │   │                      │   │                      │
+│ 1. Download package  │   │ 1. Download package  │   │ 1. Download package  │
+│ 2. Extract files     │   │ 2. Extract files     │   │ 2. Extract files     │
+│ 3. Stop IIS app      │   │ 3. Stop IIS app      │   │ 3. Stop IIS app      │
+│ 4. Deploy new files  │   │ 4. Deploy new files  │   │ 4. Deploy new files  │
+│ 5. Start IIS app     │   │ 5. Start IIS app     │   │ 5. Start IIS app     │
+│ 6. Health check      │   │ 6. Health check      │   │ 6. Health check      │
+└──────────┬───────────┘   └──────────┬───────────┘   └──────────┬───────────┘
+		   │                          │                          │
+		   └──────────────────────────┼──────────────────────────┘
+									  │
+									  ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                     Application Load Balancer                              │
+│                     Health check: /health                                  │
+│                                                                            │
+│  ✅ All instances healthy → Traffic distributed                           │
+└────────────────────────────┬───────────────────────────────────────────────┘
+							 │
+							 ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         🌐 PUBLIC INTERNET                                 │
+│                                                                            │
+│  Your API is now accessible:                                              │
+│  http://communityconnect-api-env.[id].elasticbeanstalk.com                │
+└────────────────────────────────────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+						 DEPLOYMENT TIMELINE
+
+First Deployment (includes build):
+├─ Checkout & Setup:        30 seconds
+├─ Restore & Build:         2-3 minutes
+├─ Tests:                   1-2 minutes
+├─ Package:                 30 seconds
+├─ Upload to S3:            30 seconds
+├─ Create EB version:       30 seconds
+├─ Deploy to instances:     3-4 minutes
+└─ Health checks:           30 seconds
+────────────────────────────────────────
+Total:                      8-12 minutes
+
+
+Subsequent Deployments:
+├─ Build & Test:            2-3 minutes
+├─ Upload:                  30 seconds
+├─ Deploy:                  3-4 minutes
+└─ Verify:                  30 seconds
+────────────────────────────────────────
+Total:                      6-9 minutes
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+						 MONITORING & NOTIFICATIONS
+
+GitHub Actions:
+└─ View workflow runs in Actions tab
+└─ Get email notifications on failure
+└─ See deployment status badges
+
+AWS CloudWatch:
+└─ Application logs
+└─ Performance metrics
+└─ Custom alarms
+
+AWS Elastic Beanstalk:
+└─ Environment health dashboard
+└─ Deployment history
+└─ Instance metrics
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+						 SECURITY & SECRETS
+
+GitHub Secrets (Encrypted):
+├─ AWS_ACCESS_KEY_ID
+├─ AWS_SECRET_ACCESS_KEY
+└─ Never visible in logs
+
+AWS IAM User (github-actions-deploy):
+├─ Minimal permissions
+├─ ElasticBeanstalk access
+└─ S3 upload access
+
+Application Secrets:
+├─ Database password → AWS Secrets Manager
+├─ JWT key → Environment variables
+└─ API keys → AWS Parameter Store
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+Your Complete CI/CD Pipeline:
+
+Code → Commit → Push → PR → Merge → Deploy → LIVE!
+ └─────┴───────┴──────┴────┴───────┴────────┘
+		All Automated by GitHub Actions!
+
+No manual deployments needed! 🎉
+```

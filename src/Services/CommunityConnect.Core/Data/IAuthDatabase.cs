@@ -142,5 +142,59 @@ namespace CommunityConnect.Core.Data
             string currentState,
             string currentDistrict,
             string bloodGroup);
+
+        /// <summary>
+        /// Gets user profile by ID using sp_GetUserProfileById stored procedure
+        /// </summary>
+        Task<UserProfile?> GetUserProfileByIdAsync(int id);
+
+        /// <summary>
+        /// Gets all user profiles with pagination using sp_GetAllUserProfiles stored procedure
+        /// </summary>
+        /// <param name="pageNumber">Page number (1-based)</param>
+        /// <param name="pageSize">Number of records per page</param>
+        /// <returns>Tuple containing list of user profiles and total count</returns>
+        Task<(List<UserProfile> Profiles, int TotalCount)> GetAllUserProfilesAsync(int pageNumber = 1, int pageSize = 50);
+
+        // ============================================
+        // ROLE OPERATIONS
+        // ============================================
+
+        /// <summary>
+        /// Gets all roles using sp_GetAllRoles stored procedure
+        /// </summary>
+        /// <returns>List of all roles</returns>
+        Task<List<Role>> GetAllRolesAsync();
+
+        /// <summary>
+        /// Gets a role by ID
+        /// </summary>
+        /// <param name="id">Role ID</param>
+        /// <returns>Role or null if not found</returns>
+        Task<Role?> GetRoleByIdAsync(int id);
+
+        /// <summary>
+        /// Creates a new role
+        /// </summary>
+        /// <param name="name">Role name</param>
+        /// <param name="description">Role description</param>
+        /// <returns>Created role</returns>
+        Task<Role> CreateRoleAsync(string name, string description);
+
+        /// <summary>
+        /// Updates an existing role
+        /// </summary>
+        /// <param name="id">Role ID</param>
+        /// <param name="name">Role name</param>
+        /// <param name="description">Role description</param>
+        /// <returns>Updated role or null if not found</returns>
+        Task<Role?> UpdateRoleAsync(int id, string name, string description);
+
+        /// <summary>
+        /// Deletes a role
+        /// </summary>
+        /// <param name="id">Role ID</param>
+        /// <returns>True if deleted successfully, false otherwise</returns>
+        Task<bool> DeleteRoleAsync(int id);
     }
 }

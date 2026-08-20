@@ -6,7 +6,7 @@
     <Name>CommunityConnect.Database</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{A8B9C1D2-3E4F-5A6B-7C8D-9E0F1A2B3C4D}</ProjectGuid>
+    <ProjectGuid>{a8b9c1d2-3e4f-5a6b-7c8d-9e0f1a2b3c4d}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
@@ -63,8 +63,10 @@
     <Folder Include="dbo\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommunityConnect.Database.publish.xml" />
     <None Include="README.md" />
+    <None Include="prod.publish.xml" />
+    <None Include="local.publish.xml" />
+    <None Include="development.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Roles.sql" />
@@ -109,5 +111,9 @@
     <Build Include="dbo\Stored Procedures\sp_GetOAuthProvider.sql" />
     <Build Include="dbo\Stored Procedures\sp_SetPasswordResetToken.sql" />
     <Build Include="dbo\Stored Procedures\sp_AssignUserRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CreateRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_DeleteRole.sql" />
+    <Build Include="dbo\Stored Procedures\sp_GetRoleById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_UpdateRole.sql" />
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@ namespace CommunityConnect.API.DTOs
     /// </summary>
     public class UserProfileResponse
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         // Personal Information
         public string FullName { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ namespace CommunityConnect.API.DTOs
         public string SchoolRegion { get; set; } = string.Empty;
         public int PassoutYear { get; set; }
 
-        // Current Information
+        // Current Information Testing
         public string Role { get; set; } = string.Empty;
         public string University { get; set; } = string.Empty;
         public string CurrentState { get; set; } = string.Empty;
@@ -35,13 +35,13 @@ namespace CommunityConnect.API.DTOs
         /// <summary>
         /// Maps a UserProfile domain model to a response DTO
         /// </summary>
-        public static UserProfileResponse FromUserProfile(Models.UserProfile profile)
+        public static UserProfileResponse FromUserProfile(Core.Entities.UserProfile profile)
         {
             return new UserProfileResponse
             {
                 Id = profile.Id,
                 FullName = profile.FullName,
-                EmailID = profile.EmailID,
+                EmailID = profile.Email,
                 MobileNumber = profile.MobileNumber,
                 SchoolName = profile.SchoolName,
                 State = profile.State,

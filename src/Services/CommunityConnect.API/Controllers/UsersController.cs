@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CommunityConnect.API.DTOs;
-using CommunityConnect.API.Models;
+using CommunityConnect.Core.Services;
 
 namespace CommunityConnect.API.Controllers
 {
@@ -10,12 +10,12 @@ namespace CommunityConnect.API.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
-        // TODO: Inject user profile service when implemented
-        // private readonly IUserProfileService _userProfileService;
+        private readonly IUserProfileService _userProfileService;
         private readonly ILogger<UsersController> _logger;
 
-        public UsersController(ILogger<UsersController> logger)
+        public UsersController(IUserProfileService userProfileService, ILogger<UsersController> logger)
         {
+            _userProfileService = userProfileService;
             _logger = logger;
         }
 
@@ -25,28 +25,73 @@ namespace CommunityConnect.API.Controllers
         /// <param name="id">User profile ID</param>
         /// <returns>User profile details</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]  // TODO: Remove this after testing - endpoint should require authentication
         [ProducesResponseType(typeof(UserProfileResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserProfile(Guid id)
+        public async Task<IActionResult> GetUserProfile(int id)
         {
             try
             {
                 _logger.LogInformation("Getting user profile for ID: {UserId}", id);
 
-                // TODO: Implement user profile retrieval using service
-                // var profile = await _userProfileService.GetUserProfileByIdAsync(id);
-                // if (profile == null)
-                //     return NotFound(new { message = "User profile not found" });
-                // 
-                // return Ok(UserProfileResponse.FromUserProfile(profile));
+                var profile = await _userProfileService.GetUserProfileByIdAsync(id);
+                if (profile == null)
+                    return NotFound(new { message = "User profile not found" });
 
-                return Ok(new { message = "Get user profile endpoint - to be implemented with service layer" });
+                return Ok(UserProfileResponse.FromUserProfile(profile));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting user profile {UserId}", id);
                 return StatusCode(500, new { message = "An error occurred while retrieving the user profile" });
+            }
+        }
+
+        /// <summary>
+        /// Get all user profiles with pagination
+        /// </summary>
+        /// <param name="pageNumber">Page number (default: 1)</param>
+        /// <param name="pageSize">Page size (default: 50)</param>
+        /// <param name="role">Optional role filter</param>
+        /// <returns>Paginated list of user profiles with total count</returns>
+        [HttpGet("profiles")]
+        //[Authorize(Roles = "Admin,SuperAdmin")] // Only admins can get all users
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<object>> GetAllUsers(
+            [FromQuery] int pageNumber = 1, 
+            [FromQuery] int pageSize = 50, 
+            [FromQuery] string? role = null)
+        {
+            try
+            {
+                _logger.LogInformation("Getting all user profiles - Page: {PageNumber}, PageSize: {PageSize}, Role: {Role}", 
+                    pageNumber, pageSize, role ?? "All");
+
+                var (profiles, totalCount) = await _userProfileService.GetAllUserProfilesAsync(pageNumber, pageSize, role);
+
+                var response = new
+                {
+                    profiles = profiles.Select(UserProfileResponse.FromUserProfile),
+                    pagination = new
+                    {
+                        pageNumber,
+                        pageSize,
+                        totalCount,
+                        totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+                    }
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting all user profiles");
+                return StatusCode(500, new { message = "An error occurred while retrieving user profiles" });
             }
         }
 
@@ -95,7 +140,7 @@ namespace CommunityConnect.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateUserProfile(Guid id, [FromBody] UpdateUserProfileRequest request)
+        public async Task<IActionResult> UpdateUserProfile(int id, [FromBody] UpdateUserProfileRequest request)
         {
             try
             {
@@ -129,7 +174,7 @@ namespace CommunityConnect.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteUserProfile(Guid id)
+        public async Task<IActionResult> DeleteUserProfile(int id)
         {
             try
             {
@@ -249,76 +294,6 @@ namespace CommunityConnect.API.Controllers
                 _logger.LogError(ex, "Error getting users by passout year {Year}", year);
                 return StatusCode(500, new { message = "An error occurred while retrieving users by passout year" });
             }
-        }
-
-        /// <summary>
-        /// Get user preferences
-        /// </summary>
-        [HttpGet("preferences")]
-        public async Task<IActionResult> GetUserPreferences()
-        {
-            // TODO: Implement get user preferences
-            return Ok(new { message = "Get preferences endpoint - to be implemented" });
-        }
-
-        /// <summary>
-        /// Update user preferences
-        /// </summary>
-        [HttpPut("preferences")]
-        public async Task<IActionResult> UpdateUserPreferences([FromBody] object preferences)
-        {
-            // TODO: Implement update user preferences
-            return Ok(new { message = "Update preferences endpoint - to be implemented" });
-        }
-
-        /// <summary>
-        /// Get user connections
-        /// </summary>
-        [HttpGet("connections")]
-        public async Task<IActionResult> GetConnections()
-        {
-            // TODO: Implement get connections
-            return Ok(new { message = "Get connections endpoint - to be implemented" });
-        }
-
-        /// <summary>
-        /// Send connection request
-        /// </summary>
-        [HttpPost("connections/{userId}")]
-        public async Task<IActionResult> SendConnectionRequest(Guid userId)
-        {
-            // TODO: Implement send connection request
-            return Ok(new { message = "Send connection request endpoint - to be implemented" });
-        }
-
-        /// <summary>
-        /// Accept connection request
-        /// </summary>
-        [HttpPut("connections/{connectionId}/accept")]
-        public async Task<IActionResult> AcceptConnection(int connectionId)
-        {
-            // TODO: Implement accept connection
-            return Ok(new { message = "Accept connection endpoint - to be implemented" });
-        }
-
-        /// <summary>
-        /// Reject connection request
-        /// </summary>
-        [HttpPut("connections/{connectionId}/reject")]
-        public async Task<IActionResult> RejectConnection(int connectionId)
-        {
-            // TODO: Implement reject connection
-            return Ok(new { message = "Reject connection endpoint - to be implemented" });
-        }
-
-        /// <summary>
-        /// Get user roles
-        /// </summary>
-        [HttpGet("roles")]
-        public async Task<IActionResult> GetUserRoles()
-        {
-            // TODO: Implement get user roles
-            return Ok(new { message = "Get user roles endpoint - to be implemented" });
         }
     }
 }

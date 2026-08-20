@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -35,6 +35,10 @@
     <ProjectReference Include="..\CommunityConnect.Core\CommunityConnect.Core.csproj" />
     <ProjectReference Include="..\CommunityConnect.Infrastructure\CommunityConnect.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\CommunityConnect.Contracts\CommunityConnect.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include=".ebextensions\" />
   </ItemGroup>
 
 </Project>
