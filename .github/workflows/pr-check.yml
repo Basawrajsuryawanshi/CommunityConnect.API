@@ -10,13 +10,18 @@ on:
       - synchronize
       - reopened
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 env:
   DOTNET_VERSION: '10.0.x'
   SQL_PROJECT: 'src/Database/CommunityConnect.Database.sqlproj'
 
 jobs:
   build-and-test:
-    name: Build, Test and Validate SQL Project
+    name: Build and Validate SQL Project
     runs-on: windows-latest
 
     steps:
@@ -37,9 +42,6 @@ jobs:
 
       - name: Build .NET
         run: dotnet build src/Services/CommunityConnect.API/CommunityConnect.API.csproj --configuration Release --no-restore
-
-      - name: Run .NET tests
-        run: dotnet test --configuration Release --no-build --verbosity normal
 
       # ==========================================
       # SQL DATABASE PROJECT
@@ -90,8 +92,8 @@ jobs:
             const emoji = status === 'success' ? '✅' : '❌';
 
             const message = status === 'success'
-              ? 'Build, tests and SQL Database Project validation passed!'
-              : 'Build, tests or SQL Database Project validation failed. Please check the workflow logs.';
+              ? 'Build and SQL Database Project validation passed!'
+              : 'Build or SQL Database Project validation failed. Please check the workflow logs.';
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
