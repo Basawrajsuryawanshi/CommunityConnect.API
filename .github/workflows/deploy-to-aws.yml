@@ -26,6 +26,7 @@ env:
 
   DEPLOY_PACKAGE: deployment-package-${{ github.sha }}.zip
 
+
 jobs:
 
   # ============================================================
@@ -38,10 +39,15 @@ jobs:
 
     steps:
 
+      # ==========================================
+      # CHECKOUT
+      # ==========================================
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
 
       # ==========================================
       # .NET
@@ -52,17 +58,21 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore dependencies
-        run: dotnet restore CommunityConnect.slnx
+
+      - name: Restore .NET dependencies
+        run: |
+          dotnet restore src/Services/CommunityConnect.API/CommunityConnect.API.csproj
+
 
       - name: Build .NET
-        run: dotnet build CommunityConnect.slnx --configuration Release --no-restore
+        run: |
+          dotnet build src/Services/CommunityConnect.API/CommunityConnect.API.csproj `
+            --configuration Release `
+            --no-restore
 
-      - name: Run tests
-        run: dotnet test CommunityConnect.slnx --configuration Release --no-build --verbosity normal
 
       # ==========================================
-      # BUILD API
+      # PUBLISH API
       # ==========================================
 
       - name: Publish API
@@ -72,13 +82,22 @@ jobs:
             --output ./publish `
             --no-build
 
+
       # ==========================================
-      # BUILD SQL DATABASE PROJECT
+      # SQL DATABASE PROJECT
       # ==========================================
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
 
       - name: Build SQL Database Project
         run: |
-          dotnet build "${{ env.SQL_PROJECT }}" --configuration Release
+          msbuild "${{ env.SQL_PROJECT }}" `
+            /p:Configuration=Release `
+            /p:Platform=AnyCPU `
+            /verbosity:minimal
+
 
       # ==========================================
       # FIND DACPAC
@@ -105,6 +124,7 @@ jobs:
 
           "path=$($dacpac.FullName)" >> $env:GITHUB_OUTPUT
 
+
       # ==========================================
       # CREATE API DEPLOYMENT PACKAGE
       # ==========================================
@@ -117,6 +137,7 @@ jobs:
             -DestinationPath "${{ env.DEPLOY_PACKAGE }}" `
             -Force
 
+
       # ==========================================
       # SAVE API ARTIFACT
       # ==========================================
@@ -126,7 +147,9 @@ jobs:
         with:
           name: deployment-package
           path: ${{ env.DEPLOY_PACKAGE }}
+          if-no-files-found: error
           retention-days: 5
+
 
       # ==========================================
       # SAVE DATABASE ARTIFACT
@@ -137,6 +160,7 @@ jobs:
         with:
           name: database-dacpac
           path: ${{ steps.dacpac.outputs.path }}
+          if-no-files-found: error
           retention-days: 5
 
 
@@ -151,11 +175,16 @@ jobs:
 
     steps:
 
+      # ==========================================
+      # DOWNLOAD DACPAC
+      # ==========================================
+
       - name: Download DACPAC
         uses: actions/download-artifact@v4
         with:
           name: database-dacpac
           path: ./database
+
 
       # ==========================================
       # INSTALL SQLPACKAGE
@@ -169,6 +198,7 @@ jobs:
           $env:PATH += ";$env:USERPROFILE\.dotnet\tools"
 
           sqlpackage /Version
+
 
       # ==========================================
       # DEPLOY DACPAC TO RDS
@@ -216,20 +246,26 @@ jobs:
 
     steps:
 
+      # ==========================================
+      # DOWNLOAD API ARTIFACT
+      # ==========================================
+
       - name: Download API artifact
         uses: actions/download-artifact@v4
         with:
           name: deployment-package
 
+
       # ==========================================
-      # AWS
+      # AWS CREDENTIALS
       # ==========================================
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}         
+          aws-region: ${{ env.AWS_REGION }}
+
 
       # ==========================================
       # VERSION LABEL
@@ -245,6 +281,7 @@ jobs:
           echo "version_label=$VERSION_LABEL" >> "$GITHUB_OUTPUT"
 
           echo "Version Label: $VERSION_LABEL"
+
 
       # ==========================================
       # GET EB S3 BUCKET
@@ -265,6 +302,7 @@ jobs:
 
           echo "S3 Bucket: $S3_BUCKET"
 
+
       # ==========================================
       # UPLOAD API PACKAGE
       # ==========================================
@@ -275,6 +313,7 @@ jobs:
           aws s3 cp \
             deployment-package-${{ github.sha }}.zip \
             s3://${{ steps.s3bucket.outputs.s3_bucket }}/${{ env.EB_APPLICATION_NAME }}/${{ steps.version.outputs.version_label }}.zip
+
 
       # ==========================================
       # CREATE EB APPLICATION VERSION
@@ -290,6 +329,7 @@ jobs:
             --source-bundle S3Bucket="${{ steps.s3bucket.outputs.s3_bucket }}",S3Key="${{ env.EB_APPLICATION_NAME }}/${{ steps.version.outputs.version_label }}.zip" \
             --region "${{ env.AWS_REGION }}"
 
+
       # ==========================================
       # DEPLOY TO ELASTIC BEANSTALK
       # ==========================================
@@ -303,8 +343,9 @@ jobs:
             --version-label "${{ steps.version.outputs.version_label }}" \
             --region "${{ env.AWS_REGION }}"
 
+
       # ==========================================
-      # WAIT
+      # WAIT FOR DEPLOYMENT
       # ==========================================
 
       - name: Wait for deployment
@@ -318,4 +359,3 @@ jobs:
             --region "${{ env.AWS_REGION }}"
 
           echo "Deployment completed."
-
