@@ -33,13 +33,13 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore .NET dependencies
-        run: dotnet restore CommunityConnect.slnx
+        run: dotnet restore src/Services/CommunityConnect.API/CommunityConnect.API.csproj
 
       - name: Build .NET
-        run: dotnet build CommunityConnect.slnx --configuration Release --no-restore
+        run: dotnet build src/Services/CommunityConnect.API/CommunityConnect.API.csproj --configuration Release --no-restore
 
       - name: Run .NET tests
-        run: dotnet test CommunityConnect.slnx --configuration Release --no-build --verbosity normal
+        run: dotnet test --configuration Release --no-build --verbosity normal
 
       # ==========================================
       # SQL DATABASE PROJECT
