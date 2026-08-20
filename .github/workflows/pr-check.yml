@@ -45,8 +45,19 @@ jobs:
       # SQL DATABASE PROJECT
       # ==========================================
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
       - name: Build SQL Database Project
-        run: dotnet build "${{ env.SQL_PROJECT }}" --configuration Release
+        run: |
+          msbuild "${{ env.SQL_PROJECT }}" `
+            /p:Configuration=Release `
+            /p:Platform=AnyCPU `
+            /verbosity:minimal
+
+      # ==========================================
+      # VERIFY DACPAC
+      # ==========================================
 
       - name: Verify DACPAC
         shell: pwsh
