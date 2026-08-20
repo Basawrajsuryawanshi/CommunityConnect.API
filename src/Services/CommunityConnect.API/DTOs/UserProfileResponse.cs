@@ -19,7 +19,7 @@ namespace CommunityConnect.API.DTOs
         public string SchoolRegion { get; set; } = string.Empty;
         public int PassoutYear { get; set; }
 
-        // Current Information
+        // Current Information Testing
         public string Role { get; set; } = string.Empty;
         public string University { get; set; } = string.Empty;
         public string CurrentState { get; set; } = string.Empty;
