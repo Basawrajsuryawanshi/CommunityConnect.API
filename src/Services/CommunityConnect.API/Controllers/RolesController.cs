@@ -195,5 +195,41 @@ namespace CommunityConnect.API.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the role" });
             }
         }
+
+
+        /// <summary>
+        /// Delete a role
+        /// </summary>
+        /// <param name="id">Role ID</param>
+        /// <returns>No content on success</returns>
+        [HttpDelete("{id}")]
+        [AllowAnonymous]  // TODO: Remove this after testing - endpoint should require Admin/SuperAdmin role
+        // [Authorize(Roles = "Admin,SuperAdmin")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteRoleTest(int id)
+        {
+            try
+            {
+                _logger.LogInformation("Deleting role with ID: {RoleId}", id);
+
+                var result = await _roleService.DeleteRoleAsync(id);
+
+                if (!result)
+                {
+                    return NotFound(new { message = $"Role with ID {id} not found" });
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting role with ID: {RoleId}", id);
+                return StatusCode(500, new { message = "An error occurred while deleting the role" });
+            }
+        }
     }
 }
