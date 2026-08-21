@@ -26,6 +26,7 @@ env:
 
   DEPLOY_PACKAGE: deployment-package-${{ github.sha }}.zip
 
+
 jobs:
 
   # ============================================================
@@ -207,44 +208,47 @@ jobs:
         shell: pwsh
         env:
           DB_CONNECTION_STRING: ${{ secrets.COMMUNITYCONNECT_DB_CONNECTION_STRING }}
+
         run: |
-          $builder = New-Object System.Data.SqlClient.SqlConnectionStringBuilder
-          $builder.ConnectionString = $env:DB_CONNECTION_STRING
 
-          $server = $builder.DataSource
-
-          Write-Host "Testing RDS:"
-          Write-Host $server
-
-          if ($server -match '^tcp:(.+),(\d+)$') {
-              $hostName = $matches[1]
-              $port = [int]$matches[2]
+          if ([string]::IsNullOrWhiteSpace($env:DB_CONNECTION_STRING)) {
+              Write-Error "COMMUNITYCONNECT_DB_CONNECTION_STRING secret is empty or not available."
+              exit 1
           }
-          elseif ($server -match '^(.+),(\d+)$') {
+
+          Write-Host "Connection string secret is available."
+
+          $connectionString = $env:DB_CONNECTION_STRING
+
+          if ($connectionString -match '(?i)(?:Data Source|Server)\s*=\s*(?:tcp:)?([^;,]+)(?:,(\d+))?') {
+
               $hostName = $matches[1]
-              $port = [int]$matches[2]
+              $port = if ($matches[2]) { [int]$matches[2] } else { 1433 }
+
+              Write-Host "RDS Host: $hostName"
+              Write-Host "RDS Port: $port"
+
           }
           else {
-              $hostName = $server
-              $port = 1433
+              Write-Error "Could not extract RDS host from the connection string."
+              exit 1
           }
 
-          Write-Host "Host: $hostName"
-          Write-Host "Port: $port"
+          Write-Host "Testing TCP connectivity..."
 
           $result = Test-NetConnection `
-            -ComputerName $hostName `
-            -Port $port `
-            -WarningAction SilentlyContinue
+              -ComputerName $hostName `
+              -Port $port `
+              -InformationLevel Detailed
 
           Write-Host "TCP Test Succeeded: $($result.TcpTestSucceeded)"
 
           if (-not $result.TcpTestSucceeded) {
-              Write-Error "Cannot connect to RDS on port $port."
+              Write-Error "Cannot establish TCP connection to RDS $hostName`:$port"
               exit 1
           }
 
-          Write-Host "Successfully connected to RDS on port $port."
+          Write-Host "RDS TCP connectivity successful."
 
 
       # ==========================================
@@ -369,7 +373,7 @@ jobs:
             --application-name "${{ env.EB_APPLICATION_NAME }}" \
             --version-label "${{ steps.version.outputs.version_label }}" \
             --description "Build ${{ github.run_number }} - Commit ${{ github.sha }}" \
-            --source-bundle S3Bucket="${{ steps.s3bucket.outputs.s3_bucket }},S3Key=${{ env.EB_APPLICATION_NAME }}/${{ steps.version.outputs.version_label }}.zip" \
+            --source-bundle S3Bucket="${{ steps.s3bucket.outputs.s3_bucket }}",S3Key="${{ env.EB_APPLICATION_NAME }}/${{ steps.version.outputs.version_label }}.zip" \
             --region "${{ env.AWS_REGION }}"
 
 
