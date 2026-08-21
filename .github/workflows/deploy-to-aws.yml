@@ -24,7 +24,7 @@ env:
 
   DATABASE_NAME: CommunityConnect
 
-  DEPLOY_PACKAGE: deployment-package-${{ github.sha }}
+  DEPLOY_PACKAGE: deployment-package-${{ github.sha }}.zip
 
 jobs:
 
@@ -355,7 +355,7 @@ jobs:
       - name: Upload deployment package
         run: |
           aws s3 cp \
-            deployment-package-${{ github.sha }}.zip \
+            "${{ env.DEPLOY_PACKAGE }}" \
             s3://${{ steps.s3bucket.outputs.s3_bucket }}/${{ env.EB_APPLICATION_NAME }}/${{ steps.version.outputs.version_label }}.zip
 
 
