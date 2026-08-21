@@ -156,6 +156,9 @@ jobs:
       # SAVE DATABASE ARTIFACT
       # ==========================================================
 
+      # DACPAC is still built and uploaded.
+      # It is NOT deployed to RDS at this stage.
+
       - name: Upload DACPAC artifact
         uses: actions/upload-artifact@v4
         with:
@@ -167,139 +170,150 @@ jobs:
 
   # ============================================================
   # JOB 2 - DEPLOY DATABASE
+  #
+  # TEMPORARILY DISABLED
+  #
+  # We will enable this later after the AWS self-hosted runner
+  # is configured and RDS deployment is ready.
   # ============================================================
 
-  deploy-database:
-    name: Deploy DACPAC to RDS
-    needs: build
-    runs-on: windows-latest
+  # deploy-database:
+  #   name: Deploy DACPAC to RDS
+  #   needs: build
+  #   runs-on: windows-latest
 
-    steps:
+  #   steps:
 
-      # ==========================================================
-      # DOWNLOAD DACPAC
-      # ==========================================================
+  #     # ========================================================
+  #     # DOWNLOAD DACPAC
+  #     # ========================================================
 
-      - name: Download DACPAC
-        uses: actions/download-artifact@v4
-        with:
-          name: database-dacpac
-          path: ./database
-
-
-      # ==========================================================
-      # INSTALL SQLPACKAGE
-      # ==========================================================
-
-      - name: Install SqlPackage
-        shell: pwsh
-        run: |
-
-          dotnet tool install --global microsoft.sqlpackage
-
-          $toolPath = "$env:USERPROFILE\.dotnet\tools"
-
-          $env:PATH += ";$toolPath"
-
-          # Persist PATH for subsequent GitHub Actions steps
-          $toolPath | Out-File -FilePath $env:GITHUB_PATH -Append
-
-          sqlpackage /Version
+  #     - name: Download DACPAC
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: database-dacpac
+  #         path: ./database
 
 
-      # ==========================================================
-      # TEST RDS CONNECTIVITY
-      # ==========================================================
+  #     # ========================================================
+  #     # INSTALL SQLPACKAGE
+  #     # ========================================================
 
-      - name: Test RDS connectivity
-        shell: pwsh
-        env:
-          DB_CONNECTION_STRING: ${{ secrets.COMMUNITYCONNECT_DB_CONNECTION_STRING }}
+  #     - name: Install SqlPackage
+  #       shell: pwsh
+  #       run: |
 
-        run: |
+  #         dotnet tool install --global microsoft.sqlpackage
 
-          if ([string]::IsNullOrWhiteSpace($env:DB_CONNECTION_STRING)) {
-              Write-Error "COMMUNITYCONNECT_DB_CONNECTION_STRING secret is empty or not available."
-              exit 1
-          }
+  #         $toolPath = "$env:USERPROFILE\.dotnet\tools"
 
-          Write-Host "Connection string secret is available."
+  #         $env:PATH += ";$toolPath"
 
-          $connectionString = $env:DB_CONNECTION_STRING
+  #         # Persist PATH for subsequent GitHub Actions steps
+  #         $toolPath | Out-File -FilePath $env:GITHUB_PATH -Append
 
-          if ($connectionString -match '(?i)(?:Data Source|Server)\s*=\s*(?:tcp:)?([^;,]+)(?:,(\d+))?') {
-
-              $hostName = $matches[1]
-              $port = if ($matches[2]) { [int]$matches[2] } else { 1433 }
-
-              Write-Host "RDS Host: $hostName"
-              Write-Host "RDS Port: $port"
-
-          }
-          else {
-              Write-Error "Could not extract RDS host from the connection string."
-              exit 1
-          }
-
-          Write-Host "Testing TCP connectivity..."
-
-          $result = Test-NetConnection `
-            -ComputerName $hostName `
-            -Port $port `
-            -InformationLevel Detailed
-
-          Write-Host "TCP Test Succeeded: $($result.TcpTestSucceeded)"
-
-          if (-not $result.TcpTestSucceeded) {
-              Write-Error "Cannot establish TCP connection to RDS $hostName`:$port"
-              exit 1
-          }
-
-          Write-Host "RDS TCP connectivity successful."
+  #         sqlpackage /Version
 
 
-      # ==========================================================
-      # DEPLOY DACPAC TO RDS
-      # ==========================================================
+  #     # ========================================================
+  #     # TEST RDS CONNECTIVITY
+  #     # ========================================================
 
-      - name: Deploy database to RDS
-        shell: pwsh
-        env:
-          DB_CONNECTION_STRING: ${{ secrets.COMMUNITYCONNECT_DB_CONNECTION_STRING }}
+  #     - name: Test RDS connectivity
+  #       shell: pwsh
+  #       env:
+  #         DB_CONNECTION_STRING: ${{ secrets.COMMUNITYCONNECT_DB_CONNECTION_STRING }}
 
-        run: |
+  #       run: |
 
-          $dacpac = Get-ChildItem `
-            -Path "./database" `
-            -Filter "CommunityConnect.Database.dacpac" `
-            -Recurse |
-            Select-Object -First 1
+  #         if ([string]::IsNullOrWhiteSpace($env:DB_CONNECTION_STRING)) {
+  #             Write-Error "COMMUNITYCONNECT_DB_CONNECTION_STRING secret is empty or not available."
+  #             exit 1
+  #         }
 
-          if ($null -eq $dacpac) {
-              Write-Error "DACPAC not found."
-              exit 1
-          }
+  #         Write-Host "Connection string secret is available."
 
-          Write-Host "Deploying DACPAC:"
-          Write-Host $dacpac.FullName
+  #         $connectionString = $env:DB_CONNECTION_STRING
 
-          sqlpackage `
-            /Action:Publish `
-            /SourceFile:"$($dacpac.FullName)" `
-            /TargetConnectionString:"$env:DB_CONNECTION_STRING" `
-            /p:BlockOnPossibleDataLoss=True `
-            /p:CreateNewDatabase=False `
-            /p:DropObjectsNotInSource=False `
-            /p:CommandTimeout=120
+  #         if ($connectionString -match '(?i)(?:Data Source|Server)\s*=\s*(?:tcp:)?([^;,]+)(?:,(\d+))?') {
+
+  #             $hostName = $matches[1]
+  #             $port = if ($matches[2]) { [int]$matches[2] } else { 1433 }
+
+  #             Write-Host "RDS Host: $hostName"
+  #             Write-Host "RDS Port: $port"
+
+  #         }
+  #         else {
+  #             Write-Error "Could not extract RDS host from the connection string."
+  #             exit 1
+  #         }
+
+  #         Write-Host "Testing TCP connectivity..."
+
+  #         $result = Test-NetConnection `
+  #           -ComputerName $hostName `
+  #           -Port $port `
+  #           -InformationLevel Detailed
+
+  #         Write-Host "TCP Test Succeeded: $($result.TcpTestSucceeded)"
+
+  #         if (-not $result.TcpTestSucceeded) {
+  #             Write-Error "Cannot establish TCP connection to RDS $hostName`:$port"
+  #             exit 1
+  #         }
+
+  #         Write-Host "RDS TCP connectivity successful."
+
+
+  #     # ========================================================
+  #     # DEPLOY DACPAC TO RDS
+  #     # ========================================================
+
+  #     - name: Deploy database to RDS
+  #       shell: pwsh
+  #       env:
+  #         DB_CONNECTION_STRING: ${{ secrets.COMMUNITYCONNECT_DB_CONNECTION_STRING }}
+
+  #       run: |
+
+  #         $dacpac = Get-ChildItem `
+  #           -Path "./database" `
+  #           -Filter "CommunityConnect.Database.dacpac" `
+  #           -Recurse |
+  #           Select-Object -First 1
+
+  #         if ($null -eq $dacpac) {
+  #             Write-Error "DACPAC not found."
+  #             exit 1
+  #         }
+
+  #         Write-Host "Deploying DACPAC:"
+  #         Write-Host $dacpac.FullName
+
+  #         sqlpackage `
+  #           /Action:Publish `
+  #           /SourceFile:"$($dacpac.FullName)" `
+  #           /TargetConnectionString:"$env:DB_CONNECTION_STRING" `
+  #           /p:BlockOnPossibleDataLoss=True `
+  #           /p:CreateNewDatabase=False `
+  #           /p:DropObjectsNotInSource=False `
+  #           /p:CommandTimeout=120
 
 
   # ============================================================
-  # JOB 3 - DEPLOY API
+  # JOB 2 - DEPLOY API
   # ============================================================
 
   deploy-api:
     name: Deploy API to Elastic Beanstalk
-    needs: deploy-database
+
+    # IMPORTANT:
+    # Database deployment is currently disabled.
+    # API deployment starts directly after the build.
+
+    needs: build
+
     runs-on: ubuntu-latest
 
     steps:
