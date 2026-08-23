@@ -9,5 +9,7 @@ BEGIN
 	UPDATE Users
 	SET LastLoginAt = @LastLoginAt,
 		UpdatedAt = GETUTCDATE()
-	WHERE Id = @UserId AND IsDeleted = 0;
+	WHERE Id = @UserId
+		AND IsActive = 1
+		AND IsDeleted = 0;
 END

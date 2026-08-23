@@ -5,11 +5,14 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	SET @Email = NULLIF(LOWER(LTRIM(RTRIM(@Email))), N'');
+
 	SELECT 
 		Id, Email, PasswordHash, EmailVerified,
 		EmailVerificationToken, EmailVerificationExpiry,
 		PasswordResetToken, PasswordResetExpiry,
 		IsActive, IsDeleted, CreatedAt, UpdatedAt, LastLoginAt
 	FROM Users
-	WHERE Email = @Email AND IsDeleted = 0;
+	WHERE LOWER(LTRIM(RTRIM(Email))) = @Email
+		AND IsDeleted = 0;
 END
